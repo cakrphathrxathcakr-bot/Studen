@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปผลข้อมูลนักเรียน - สำนักศาสนศึกษาวัดประสานศรัทธา</title>
+    
+    <!-- ฟอนต์ Sarabun ภาษาไทย -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS สำหรับตกแต่งความสวยงาม -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js สำหรับสร้างกราฟ -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- PapaParse สำหรับอ่านไฟล์ CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <!-- SheetJS สำหรับอ่านไฟล์ Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- Marked.js สำหรับแปลง Markdown จาก AI เป็น HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f9f8f6; /* สีพื้นหลังโทนสบายตา */
+        }
+        .temple-gradient {
+            background: linear-gradient(135deg, #7f1d1d, #991b1b); /* แดงเลือดหมู */
+        }
+        .ai-gradient {
+            background: linear-gradient(135deg, #d97706, #f59e0b); /* ทอง/อำพัน */
+        }
+        /* Markdown Styles for AI Output */
+        .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #7f1d1d; }
+        .prose p { margin-bottom: 0.75rem; line-height: 1.6; }
+        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .prose ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .prose strong { color: #111827; }
+    </style>
+</head>
+<body class="text-gray-800 overflow-x-hidden">
+
+    <!-- หน้าต่างต้อนรับ (Welcome Screen) -->
+    <div id="welcomeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-red-950 via-red-900 to-red-950 transition-opacity duration-700">
+        <div class="text-center px-4 transform transition-transform duration-700 hover:scale-105">
+            <!-- ธรรมจักรจำลอง (สามารถเปลี่ยนเป็นโลโก้วัดได้) -->
+            <div class="flex justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v12M6 12h12M7.75 7.75l8.5 8.5M16.25 7.75l-8.5 8.5" />
+                </svg>
+            </div>
+            
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-yellow-400 drop-shadow-md">สำนักศาสนศึกษาวัดประสานศรัทธา</h1>
+            <p class="text-xl md:text-2xl mb-12 text-yellow-100 font-light drop-shadow">ระบบสรุปผลข้อมูลนักเรียน ปีการศึกษา ๒๕๖๙</p>
+            
+            <button onclick="enterWebsite()" class="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-red-950 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 text-xl flex items-center justify-center mx-auto gap-2">
+                <span>เข้าสู่เว็บไซต์</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- เนื้อหาหลักของเว็บไซต์ (ซ่อนไว้ตอนเริ่มต้น) -->
+    <div id="mainContent" class="hidden opacity-0 transition-opacity duration-1000 min-h-screen flex flex-col">
+        
+        <!-- Header -->
+        <header class="temple-gradient text-white shadow-lg py-8 px-4 text-center border-b-4 border-yellow-500">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2">ระบบสรุปผลข้อมูลนักเรียน</h1>
+            <h2 class="text-xl md:text-2xl font-medium text-yellow-300">สำนักศาสนศึกษาวัดประสานศรัทธา ปีการศึกษา ๒๕๖๙</h2>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+            
+            <!-- ส่วนการเชื่อมต่อข้อมูล Google Sheets -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8 border-l-4 border-red-800 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-1">สถานะข้อมูล Google Sheets</h3>
+                    <p class="text-sm text-gray-500">ระบบเชื่อมต่อและดึงข้อมูลล่าสุดจากชีตโดยอัตโนมัติ (กดปุ่มด้านขวาเพื่อโหลดข้อมูลใหม่)</p>
+                </div>
+                <button onclick="fetchGoogleSheetData()" class="bg-red-50 border border-red-200 text-red-800 hover:bg-red-100 px-6 py-2 rounded-lg font-semibold transition flex items-center shadow-sm whitespace-nowrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span id="refreshText">อัปเดตข้อมูล</span>
+                </button>
+            </div>
+
+            <!-- การ์ดสรุปจำนวน (Summary Cards) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6 flex flex-col items-center justify-center border-b-4 border-red-800 transform transition hover:scale-105">
+                    <span class="text-gray-500 text-lg font-medium">จำนวนนักเรียนรวม</span>
+                    <span id="totalStudents" class="text-5xl font-bold text-red-800 mt-2">๐</span>
+                    <span class="text-gray-400 mt-1">รูป</span>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6 flex flex-col items-center justify-center border-b-4 border-red-600 transform transition hover:scale-105">
+                    <span class="text-gray-500 text-lg font-medium">พระภิกษุ</span>
+                    <span id="totalMonks" class="text-4xl font-bold text-red-600 mt-2">๐</span>
+                    <span class="text-gray-400 mt-1">รูป</span>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 flex flex-col items-center justify-center border-b-4 border-yellow-500 transform transition hover:scale-105">
+                    <span class="text-gray-500 text-lg font-medium">สามเณร</span>
+                    <span id="totalNovices" class="text-4xl font-bold text-yellow-600 mt-2">๐</span>
+                    <span class="text-gray-400 mt-1">รูป</span>
+                </div>
+            </div>
+
+            <!-- กราฟ (Charts) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- กราฟโดนัท (เปอร์เซ็นต์) -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-semibold text-center text-gray-700 mb-4">สัดส่วนผู้สมัครตามชั้นเรียน (เปอร์เซ็นต์)</h3>
+                    <div class="relative h-72 w-full flex justify-center">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- กราฟแท่ง (จำนวน) -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-semibold text-center text-gray-700 mb-4">จำนวนผู้สมัครแยกตามชั้นเรียน</h3>
+                    <div class="relative h-72 w-full">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- รายชื่อแยกตามชั้น -->
+            <div class="mb-8 mt-12">
+                <h3 class="text-2xl font-bold text-gray-700 mb-6 border-l-4 border-yellow-500 pl-4">รายชื่อนักเรียนแยกตามชั้นเรียน</h3>
+                <div id="studentListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- ข้อมูลรายชื่อจะถูกสร้างจาก JavaScript -->
+                </div>
+            </div>
+
+            <!-- ฟีเจอร์ผู้ช่วย AI (Gemini API) -->
+            <div class="mb-8 mt-12 bg-red-50 rounded-xl shadow-md p-6 border-l-4 border-red-800">
+                <div class="flex items-center justify-between flex-wrap gap-4 mb-4">
+                    <h3 class="text-2xl font-bold text-red-900 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        ผู้ช่วย AI อัจฉริยะ (Gemini)
+                    </h3>
+                </div>
+                <p class="text-gray-600 mb-6">ใช้พลังของ AI ในการวิเคราะห์ข้อมูลหรือช่วยร่างเอกสารรายงานโดยอัตโนมัติจากข้อมูลนักเรียนในปัจจุบัน</p>
+                
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <button onclick="analyzeData()" class="ai-gradient text-white px-6 py-3 rounded-lg shadow hover:shadow-lg transition flex items-center font-medium">
+                        ✨ วิเคราะห์ข้อมูลภาพรวม
+                    </button>
+                    <button onclick="draftReport()" class="bg-white border-2 border-red-800 text-red-800 px-6 py-3 rounded-lg shadow hover:bg-red-50 transition flex items-center font-medium">
+                        ✨ ร่างหนังสือรายงานสรุปยอด
+                    </button>
+                </div>
+
+                <!-- ส่วนแสดงผลของ AI -->
+                <div id="aiOutputContainer" class="hidden">
+                    <div class="bg-white rounded-lg p-6 border border-red-200 shadow-inner min-h-[150px] relative">
+                        <!-- Loading Spinner -->
+                        <div id="aiLoading" class="hidden flex-col items-center justify-center py-8">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-800 mb-4"></div>
+                            <p class="text-red-800 font-medium animate-pulse">AI กำลังประมวลผล โปรดรอสักครู่...</p>
+                        </div>
+                        <!-- Output Content -->
+                        <div id="aiContent" class="prose max-w-none text-gray-700"></div>
+                    </div>
+                    <div class="mt-3 text-right">
+                        <button onclick="copyAiContent()" class="text-sm text-red-800 hover:text-red-900 font-medium font-bold underline">คัดลอกข้อความ</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-red-950 text-white py-6 mt-auto border-t-2 border-yellow-600">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <p class="text-sm md:text-base font-light text-gray-300">
+                    รวบรวมข้อมูลโดย <span class="font-medium text-yellow-400">พระมหาจักรภัทร คมฺภีรญาณเมธี</span>
+                </p>
+                <p class="text-sm font-light text-gray-400 mt-1">
+                    เลขานุการเจ้าสำนักศาสนศึกษาวัดประสานศรัทธา
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // API Key สำหรับ Gemini (Environment provides this at runtime)
+        const apiKey = "";
+        
+        // ฟังก์ชันแปลงเลขอารบิกเป็นเลขไทย
+        function toThaiNumerals(num) {
+            if (num === null || num === undefined) return '';
+            const thaiNumbers = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙'];
+            return num.toString().replace(/\d/g, match => thaiNumbers[match]);
+        }
+
+        // ฟังก์ชันเข้าสู่เว็บไซต์ (ซ่อน Welcome Screen)
+        function enterWebsite() {
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const mainContent = document.getElementById('mainContent');
+            
+            // เฟดหน้าจอแรกออก
+            welcomeScreen.classList.add('opacity-0');
+            
+            // รอจนกว่า transition จะเสร็จ
+            setTimeout(() => {
+                welcomeScreen.classList.add('hidden');
+                
+                // แสดงหน้าหลักและเฟดเข้า
+                mainContent.classList.remove('hidden');
+                // บังคับให้เบราว์เซอร์ reflow เพื่อให้ transition ทำงาน
+                void mainContent.offsetWidth;
+                mainContent.classList.remove('opacity-0');
+            }, 700);
+        }
+
+        // ตัวแปรเก็บข้อมูลปัจจุบัน เพื่อส่งให้ AI
+        let currentStats = {
+            total: 0,
+            monks: 0,
+            novices: 0,
+            classCounts: {}
+        };
+
+        // ตัวแปรเก็บกราฟ
+        let myPieChart = null;
+        let myBarChart = null;
+
+        // ฟังก์ชันแปลงข้อมูลแบบอาร์เรย์ (จาก CSV Google Sheets)
+        function processJSONData(data) {
+            let totalStudents = 0;
+            let totalMonks = 0;
+            let totalNovices = 0;
+            let classCounts = {};
+            let studentsByClass = {};
+
+            data.forEach(row => {
+                const className = row['ชั้นเรียนที่สมัคร']?.toString().trim();
+                const name = row['ชื่อ']?.toString().trim();
+                const title = row['ฉายา']?.toString().trim();
+                const surname = row['นามสกุล']?.toString().trim();
+
+                if (!className || !name) return;
+
+                totalStudents++;
+
+                if (name.startsWith('พระ')) {
+                    totalMonks++;
+                } else if (name.startsWith('สามเณร')) {
+                    totalNovices++;
+                }
+
+                if (classCounts[className]) {
+                    classCounts[className]++;
+                } else {
+                    classCounts[className] = 1;
+                }
+
+                if (!studentsByClass[className]) {
+                    studentsByClass[className] = [];
+                }
+                
+                let fullName = name;
+                if (title && title !== '-') fullName += ' ' + title;
+                if (surname && surname !== '-') fullName += ' ' + surname;
+                
+                studentsByClass[className].push(fullName);
+            });
+            
+            // เก็บสถานะปัจจุบันสำหรับการเรียกใช้งาน AI
+            currentStats = {
+                total: totalStudents,
+                monks: totalMonks,
+                novices: totalNovices,
+                classCounts: classCounts
+            };
+
+            updateDashboard(totalStudents, totalMonks, totalNovices, classCounts, studentsByClass);
+        }
+
+        // ฟังก์ชันอัปเดตหน้าจอและสร้างกราฟ
+        function updateDashboard(total, monks, novices, classCounts, studentsByClass) {
+            // แปลงตัวเลขสรุปเป็นเลขไทย
+            document.getElementById('totalStudents').innerText = toThaiNumerals(total);
+            document.getElementById('totalMonks').innerText = toThaiNumerals(monks);
+            document.getElementById('totalNovices').innerText = toThaiNumerals(novices);
+
+            const labels = Object.keys(classCounts);
+            const values = Object.values(classCounts);
+            
+            // ชุดสีใหม่ โทนแดง-ทอง ให้เข้ากับธีมวัด
+            const colors = ['#7f1d1d', '#991b1b', '#b91c1c', '#dc2626', '#d97706', '#f59e0b', '#fbbf24'];
+
+            if (myPieChart) myPieChart.destroy();
+            if (myBarChart) myBarChart.destroy();
+
+            // กราฟโดนัท
+            const ctxPie = document.getElementById('pieChart').getContext('2d');
+            myPieChart = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: { labels: labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 1 }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) { label += ': '; }
+                                    const val = context.parsed;
+                                    const percentage = ((val / total) * 100).toFixed(1);
+                                    // แปลงตัวเลขใน Tooltip เป็นเลขไทย
+                                    label += toThaiNumerals(val) + ' รูป (' + toThaiNumerals(percentage) + '%)';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // กราฟแท่ง
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            myBarChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'จำนวนนักเรียน (รูป)', data: values,
+                        backgroundColor: '#991b1b', borderColor: '#7f1d1d', borderWidth: 1, borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { 
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { 
+                                stepSize: 1,
+                                // แปลงแกน Y เป็นเลขไทย
+                                callback: function(value) {
+                                    return toThaiNumerals(value);
+                                }
+                            } 
+                        } 
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    // แปลง Tooltip กราฟแท่งเป็นเลขไทย
+                                    return ' จำนวน ' + toThaiNumerals(context.parsed.y) + ' รูป';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // สร้าง HTML แสดงรายชื่อแยกตามชั้นเรียน
+            const listContainer = document.getElementById('studentListContainer');
+            if (listContainer && studentsByClass) {
+                listContainer.innerHTML = '';
+                const sortedClasses = Object.keys(studentsByClass).sort();
+
+                sortedClasses.forEach(className => {
+                    const students = studentsByClass[className];
+                    const card = document.createElement('div');
+                    card.className = 'bg-white rounded-xl shadow-md p-6 border-t-4 border-yellow-500 h-full';
+                    
+                    const header = document.createElement('h4');
+                    header.className = 'text-lg font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2';
+                    // เปลี่ยนจำนวนนักเรียนหลังชั้นเรียนเป็นเลขไทย
+                    header.innerText = `${className} (${toThaiNumerals(students.length)} รูป)`;
+                    card.appendChild(header);
+
+                    // ใช้ ul แทน ol เพื่อควบคุมเลขลำดับแบบไทยด้วยตัวเอง
+                    const ul = document.createElement('ul');
+                    ul.className = 'text-gray-600 space-y-1 text-sm';
+                    
+                    students.forEach((studentName, index) => {
+                        const li = document.createElement('li');
+                        // สร้างเลขลำดับเป็นเลขไทย
+                        li.innerText = `${toThaiNumerals(index + 1)}. ${studentName}`;
+                        ul.appendChild(li);
+                    });
+
+                    card.appendChild(ul);
+                    listContainer.appendChild(card);
+                });
+            }
+        }
+
+        // ดึงข้อมูลอัตโนมัติจาก Google Sheets
+        const sheetId = '1Kc-No3IS8H5bT0wUcubRBI31x-b3SIc8L_QzMerEZ2k';
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+
+        function fetchGoogleSheetData() {
+            const refreshBtn = document.getElementById('refreshText');
+            if (refreshBtn) refreshBtn.innerText = 'กำลังโหลด...';
+
+            Papa.parse(csvUrl, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    processJSONData(results.data);
+                    if (refreshBtn) refreshBtn.innerText = 'อัปเดตข้อมูลสำเร็จ';
+                    setTimeout(() => { if (refreshBtn) refreshBtn.innerText = 'อัปเดตข้อมูล'; }, 2000);
+                },
+                error: function(err) {
+                    console.error("Error fetching data:", err);
+                    alert("ไม่สามารถดึงข้อมูลจาก Google Sheets ได้ กรุณาตรวจสอบการตั้งค่าการแชร์");
+                    if (refreshBtn) refreshBtn.innerText = 'โหลดล้มเหลว ลองใหม่';
+                }
+            });
+        }
+
+        // เริ่มโหลดข้อมูลทันที (ทำงานเบื้องหลังขณะอยู่ที่หน้า Welcome)
+        window.addEventListener('DOMContentLoaded', fetchGoogleSheetData);
+
+        // ----------------------------------------------------------------------
+        // ส่วนการเชื่อมต่อกับ Gemini API (AI Features)
+        // ----------------------------------------------------------------------
+
+        async function callGeminiAPI(promptText) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            // กำชับให้ AI ใช้ตัวเลขไทยในการตอบ
+            const systemPrompt = "คุณคือผู้ช่วย AI ของสำนักศาสนศึกษาวัดประสานศรัทธา มีหน้าที่ให้คำแนะนำ วิเคราะห์ข้อมูล และร่างเอกสารที่เกี่ยวข้องกับการศึกษาของคณะสงฆ์ไทย ใช้ภาษาที่เป็นทางการ สุภาพ และเหมาะสมกับสมณสารูป (ศัพท์สำหรับพระภิกษุสงฆ์) ข้อสำคัญ: กรุณาใช้ตัวเลขไทย (๐-๙) ในการเขียนตอบทุกครั้งห้ามใช้เลขอารบิก";
+            
+            const payload = {
+                contents: [{ parts: [{ text: promptText }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            let delay = 1000;
+            const maxRetries = 5;
+
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    return result.candidates[0].content.parts[0].text;
+                    
+                } catch (error) {
+                    if (i === maxRetries - 1) {
+                        return `**เกิดข้อผิดพลาดในการเชื่อมต่อ AI:** ขออภัย ไม่สามารถประมวลผลได้ในขณะนี้ กรุณาลองใหม่อีกครั้งในภายหลัง (${error.message})`;
+                    }
+                    await new Promise(res => setTimeout(res, delay));
+                    delay *= 2; // Exponential backoff
+                }
+            }
+        }
+
+        function showAiLoading() {
+            document.getElementById('aiOutputContainer').classList.remove('hidden');
+            document.getElementById('aiLoading').classList.remove('hidden');
+            document.getElementById('aiLoading').classList.add('flex');
+            document.getElementById('aiContent').innerHTML = '';
+        }
+
+        function displayAiResult(markdownText) {
+            document.getElementById('aiLoading').classList.add('hidden');
+            document.getElementById('aiLoading').classList.remove('flex');
+            // ใช้ Marked.js เพื่อแปลง Markdown เป็น HTML
+            document.getElementById('aiContent').innerHTML = marked.parse(markdownText);
+        }
+
+        // ฟีเจอร์ที่ 1: วิเคราะห์ข้อมูลภาพรวม
+        async function analyzeData() {
+            if (currentStats.total === 0) return;
+            showAiLoading();
+            
+            let classDetails = '';
+            for (const [className, count] of Object.entries(currentStats.classCounts)) {
+                classDetails += `- ${className}: ${toThaiNumerals(count)} รูป\n`;
+            }
+
+            const prompt = `จากข้อมูลของสำนักศาสนศึกษาวัดประสานศรัทธา ปีการศึกษา ๒๕๖๙ มีผู้สมัครเรียนรวมทั้งสิ้น ${toThaiNumerals(currentStats.total)} รูป แบ่งเป็นพระภิกษุ ${toThaiNumerals(currentStats.monks)} รูป และสามเณร ${toThaiNumerals(currentStats.novices)} รูป\n\nรายละเอียดตามชั้นเรียนมีดังนี้:\n${classDetails}\n\nในฐานะผู้เชี่ยวชาญด้านการจัดการศึกษาคณะสงฆ์ โปรดช่วยเขียน ๑) บทสรุปการวิเคราะห์สัดส่วนผู้เรียน และ ๒) ข้อเสนอแนะในการจัดการเรียนการสอนและการสนับสนุนสื่อการสอนให้เหมาะสมกับสัดส่วนผู้เรียนนี้`;
+            
+            const result = await callGeminiAPI(prompt);
+            displayAiResult(result);
+        }
+
+        // ฟีเจอร์ที่ 2: ร่างหนังสือรายงานสรุปยอด
+        async function draftReport() {
+            if (currentStats.total === 0) return;
+            showAiLoading();
+            
+            let classDetails = '';
+            for (const [className, count] of Object.entries(currentStats.classCounts)) {
+                classDetails += `${className} จำนวน ${toThaiNumerals(count)} รูป, `;
+            }
+
+            const prompt = `ช่วยร่าง "หนังสือราชการคณะสงฆ์" (แบบพิมพ์หนังสือรายงานทั่วไป) เพื่อรายงานจำนวนนักเรียนประจำปีการศึกษา ๒๕๖๙ ของสำนักศาสนศึกษาวัดประสานศรัทธา (ตั้งอยู่ที่ ต.เก่ากลอย อ.นากลาง จ.หนองบัวลำภู) \n\nข้อมูลผู้เรียนมีดังนี้: รวมทั้งสิ้น ${toThaiNumerals(currentStats.total)} รูป (พระภิกษุ ${toThaiNumerals(currentStats.monks)} รูป, สามเณร ${toThaiNumerals(currentStats.novices)} รูป) แยกเป็นชั้นเรียนคือ ${classDetails} \n\nโดยให้ผู้ลงนามคือ พระมหาจักรภัทร คมฺภีรญาณเมธี (เลขานุการเจ้าสำนักศาสนศึกษาวัดประสานศรัทธา) ร่างให้เป็นทางการ มีคำขึ้นต้น คำลงท้ายที่ถูกต้องตามระเบียบงานสารบรรณคณะสงฆ์`;
+            
+            const result = await callGeminiAPI(prompt);
+            displayAiResult(result);
+        }
+
+        // ฟังก์ชันสำหรับคัดลอกข้อความ
+        function copyAiContent() {
+            const content = document.getElementById('aiContent').innerText;
+            if(!content) return;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = content;
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                const msg = document.createElement('div');
+                msg.textContent = 'คัดลอกข้อความเรียบร้อยแล้ว';
+                msg.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 transition-opacity duration-500';
+                document.body.appendChild(msg);
+                setTimeout(() => {
+                    msg.style.opacity = '0';
+                    setTimeout(() => document.body.removeChild(msg), 500);
+                }, 2000);
+            } catch (err) {
+                console.error('ไม่สามารถคัดลอกได้', err);
+            }
+            
+            document.body.removeChild(textarea);
+        }
+    </script>
+</body>
+</html>
