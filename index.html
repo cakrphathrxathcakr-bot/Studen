@@ -3,38 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สำนักศาสนศึกษาวัดประสานศรัทธา | ข้อมูลพื้นฐานทางการศึกษา</title>
+    <title>ระบบสารสนเทศ สำนักศาสนศึกษาวัดประสานศรัทธา</title>
     
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- AOS Animation -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js & PapaParse -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
+    <!-- Tailwind Config for Premium Look -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            red: '#9f1239', // Ruby 700
-                            dark: '#4c0519', // Ruby 900
-                            gold: '#d97706', // Amber 600
-                            light: '#fef3c7' // Amber 50
+                        temple: {
+                            dark: '#0f172a', // Slate 900
+                            darker: '#020617', // Slate 950
+                            gold: '#D4AF37', // Premium Gold
+                            goldlight: '#FDE047',
+                            crimson: '#881337', // Rose 900
+                            ivory: '#FAFAF9', // Stone 50
                         }
                     },
                     fontFamily: {
                         heading: ['Prompt', 'sans-serif'],
-                        sans: ['Sarabun', 'sans-serif'],
+                        body: ['Sarabun', 'sans-serif'],
                     },
                     boxShadow: {
-                        'soft': '0 20px 40px -15px rgba(0,0,0,0.05)',
-                        'glow': '0 0 20px rgba(217, 119, 6, 0.3)',
+                        'gold-glow': '0 0 20px rgba(212, 175, 55, 0.3)',
+                        'premium': '0 10px 40px -10px rgba(0,0,0,0.08)',
                     }
                 }
             }
@@ -42,740 +52,707 @@
     </script>
 
     <style>
-        body {
-            background-color: #fafaf9;
-            color: #292524;
-        }
-        
-        .text-gradient-gold {
-            background: linear-gradient(to right, #fbbf24, #d97706);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .bento-card {
-            background: #ffffff;
-            border-radius: 24px;
-            border: 1px solid rgba(0,0,0,0.04);
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.03);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .bento-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.08);
-        }
+        body { background-color: #FAFAF9; font-family: 'Sarabun', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-heading { font-family: 'Prompt', sans-serif; }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 10px; }
 
-        /* Accordion Custom Styling */
-        details > summary { list-style: none; }
-        details > summary::-webkit-details-marker { display: none; }
-        details[open] summary ~ * { animation: sweep .3s ease-in-out; }
-        @keyframes sweep {
-            0%    {opacity: 0; margin-top: -10px}
-            100%  {opacity: 1; margin-top: 0px}
+        /* Background Effects */
+        .bg-mesh-dark {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(136, 19, 55, 0.4) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(212, 175, 55, 0.15) 0px, transparent 50%);
         }
 
-        .indent-text { text-indent: 2.5rem; }
-        .reveal-up { transform: translateY(-100%); border-bottom-left-radius: 50%; border-bottom-right-radius: 50%; }
+        .bg-mesh-light {
+            background-color: #FAFAF9;
+            background-image: 
+                radial-gradient(at 100% 0%, rgba(212, 175, 55, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(136, 19, 55, 0.05) 0px, transparent 50%);
+        }
 
+        /* Glass Panels */
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-light {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Hover Transitions */
+        .hover-lift { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease; }
+        .hover-lift:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -10px rgba(212, 175, 55, 0.2); }
+
+        /* Typography Balance */
+        .text-balance { text-wrap: balance; }
+
+        /* Loader */
         .loader-ring {
-            display: inline-block;
-            width: 40px; height: 40px;
-            border: 3px solid rgba(217, 119, 6, 0.2);
-            border-radius: 50%;
-            border-top-color: #d97706;
-            animation: spin 1s ease-in-out infinite;
+            display: inline-block; width: 64px; height: 64px;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-ring:after {
+            content: " "; display: block; width: 48px; height: 48px;
+            margin: 8px; border-radius: 50%;
+            border: 4px solid #D4AF37;
+            border-color: #D4AF37 transparent #D4AF37 transparent;
+            animation: loader-ring 1.2s linear infinite;
+        }
+        @keyframes loader-ring { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Shimmer Loading for Cards */
+        .shimmer {
+            background: #f6f7f8;
+            background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+            background-repeat: no-repeat; background-size: 800px 100%;
+            animation-duration: 1.5s; animation-fill-mode: forwards;
+            animation-iteration-count: infinite; animation-name: placeholderShimmer; animation-timing-function: linear;
+        }
+        @keyframes placeholderShimmer { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
+
+        /* Text Gradient */
+        .text-gradient-gold {
+            background: linear-gradient(to right, #D4AF37, #FDE047, #D4AF37);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-size: 200% auto; animation: shine 4s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
     </style>
 </head>
-<body class="antialiased selection:bg-brand-gold selection:text-white">
+<body class="text-gray-800 antialiased bg-mesh-light selection:bg-temple-gold selection:text-temple-darker overflow-x-hidden">
 
-    <div id="welcomeScreen" class="fixed inset-0 z-[100] bg-brand-dark flex flex-col items-center justify-center transition-all duration-1000 ease-[cubic-bezier(0.87,0,0.13,1)] overflow-hidden">
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 mix-blend-overlay"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-red rounded-full blur-[120px] opacity-20"></div>
-        
-        <div class="relative z-10 text-center px-6 transform transition-all duration-700 delay-100" id="welcomeContent">
-            <div class="mb-8 relative inline-block">
-                <div class="absolute inset-0 bg-brand-gold blur-2xl opacity-30 rounded-full"></div>
-                <i class="fa-solid fa-dharmachakra text-7xl md:text-8xl text-brand-gold relative z-10 animate-[spin_20s_linear_infinite]"></i>
+    <!-- Welcome / Splash Screen -->
+    <div id="welcomeScreen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-temple-darker transition-all duration-1000">
+        <div class="absolute inset-0 bg-mesh-dark opacity-60"></div>
+        <div class="relative z-10 text-center px-4 max-w-5xl transition-all duration-1000 translate-y-0 opacity-100" id="welcomeContent">
+            
+            <div class="mb-10 relative inline-block">
+                <div class="absolute inset-0 bg-temple-gold rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                <i class="fa-solid fa-dharmachakra text-7xl md:text-9xl text-temple-gold animate-[spin_20s_linear_infinite] relative z-10"></i>
             </div>
             
-            <h1 class="font-heading text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 tracking-tight leading-tight">
-                สำนักศาสนศึกษา<br>วัดประสานศรัทธา
+            <h1 class="font-heading text-3xl md:text-5xl lg:text-7xl font-bold mb-6 text-white tracking-wide text-balance leading-tight">
+                สำนักศาสนศึกษา<br><span class="text-gradient-gold mt-2 block">วัดประสานศรัทธา</span>
             </h1>
-            <p class="font-heading text-lg md:text-xl text-brand-gold font-light mb-12 tracking-widest">
-                คู่มือข้อมูลพื้นฐานทางการศึกษา ประจำปี ๒๕๖๙
+            <p class="text-sm md:text-xl text-gray-400 font-light tracking-[0.2em] uppercase mb-12">
+                Nong Bua Lam Phu • Thailand
             </p>
             
-            <button onclick="enterWebsite()" class="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-brand-dark font-heading font-semibold rounded-full overflow-hidden transition-transform hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(255,255,255,0.2)]">
-                <span class="relative z-10">เข้าสู่ระบบฐานข้อมูล</span>
-                <i class="fa-solid fa-arrow-right-to-bracket relative z-10 group-hover:translate-x-1 transition-transform"></i>
+            <button onclick="enterWebsite()" class="group relative overflow-hidden rounded-full bg-transparent border border-temple-gold px-10 py-4 text-temple-gold transition-all hover:bg-temple-gold hover:text-temple-darker shadow-gold-glow">
+                <span class="relative z-10 font-heading font-semibold tracking-wider text-lg">เข้าสู่ระบบสารสนเทศ</span>
+                <div class="absolute inset-0 h-full w-0 bg-temple-gold transition-all duration-300 ease-out group-hover:w-full"></div>
             </button>
         </div>
     </div>
 
+    <!-- Main Application -->
     <div id="mainContent" class="hidden opacity-0 transition-opacity duration-1000 flex flex-col min-h-screen">
         
-        <div class="fixed top-0 w-full z-50 px-4 py-4 pointer-events-none transition-all duration-300" id="navWrapper">
-            <nav id="navbar" class="glass-nav max-w-7xl mx-auto rounded-full px-6 py-3 flex items-center justify-between shadow-soft pointer-events-auto transition-all duration-500">
+        <!-- Modern Floating Navbar -->
+        <div class="fixed top-4 inset-x-0 z-50 px-4 md:px-8 pointer-events-none">
+            <nav id="navbar" class="pointer-events-auto max-w-7xl mx-auto glass-dark rounded-full px-6 py-3 md:py-4 flex items-center justify-between shadow-2xl border border-white/10 transition-all duration-500 transform translate-y-0">
                 <div class="flex items-center gap-4 cursor-pointer group" onclick="window.scrollTo(0,0)">
-                    <div class="w-10 h-10 rounded-full bg-brand-light flex items-center justify-center group-hover:bg-brand-gold transition-colors">
-                        <i class="fa-solid fa-dharmachakra text-brand-gold group-hover:text-white transition-colors animate-[spin_15s_linear_infinite]"></i>
-                    </div>
-                    <div class="hidden sm:block">
-                        <h2 class="font-heading font-bold text-gray-900 leading-tight">วัดประสานศรัทธา</h2>
-                        <p class="text-[10px] text-gray-500 font-medium">สำนักศาสนศึกษา</p>
-                    </div>
+                    <i class="fa-solid fa-dharmachakra text-2xl text-temple-gold group-hover:rotate-180 transition-transform duration-700"></i>
+                    <span class="font-heading font-semibold text-lg md:text-xl text-white tracking-wide">วัดประสานศรัทธา</span>
                 </div>
                 
-                <div class="hidden lg:flex items-center space-x-2">
-                    <a href="#about" class="px-4 py-2 rounded-full text-gray-600 hover:text-brand-gold hover:bg-brand-light font-medium transition-all text-sm">ข้อมูลทั่วไป</a>
-                    <a href="#personnel" class="px-4 py-2 rounded-full text-gray-600 hover:text-brand-gold hover:bg-brand-light font-medium transition-all text-sm">บุคลากร</a>
-                    <a href="#rules" class="px-4 py-2 rounded-full text-gray-600 hover:text-brand-gold hover:bg-brand-light font-medium transition-all text-sm">ระเบียบ/ตารางสอน</a>
-                    <a href="#stats" class="px-4 py-2 rounded-full text-gray-600 hover:text-brand-gold hover:bg-brand-light font-medium transition-all text-sm">สถิติ/ทำเนียบ</a>
+                <div class="hidden md:flex items-center space-x-1 font-heading text-sm">
+                    <a href="#about" class="px-5 py-2 text-gray-300 hover:text-temple-gold rounded-full hover:bg-white/5 transition">ข้อมูลองค์กร</a>
+                    <a href="#personnel" class="px-5 py-2 text-gray-300 hover:text-temple-gold rounded-full hover:bg-white/5 transition">บุคลากร</a>
+                    <a href="#dashboard" class="px-5 py-2 bg-temple-gold/10 text-temple-gold rounded-full hover:bg-temple-gold hover:text-temple-darker transition font-semibold">
+                        <i class="fa-solid fa-chart-simple mr-2"></i>ระบบฐานข้อมูล
+                    </a>
                 </div>
-
-                <a href="#stats" class="bg-brand-dark text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-brand-red transition-colors shadow-md flex items-center gap-2">
-                    <i class="fa-solid fa-chart-pie"></i> <span>ระบบฐานข้อมูล</span>
+                
+                <a href="#dashboard" class="md:hidden w-10 h-10 rounded-full bg-temple-gold text-temple-darker flex items-center justify-center">
+                    <i class="fa-solid fa-chart-simple"></i>
                 </a>
             </nav>
         </div>
 
-        <section id="home" class="relative pt-40 pb-20 px-4 overflow-hidden flex items-center justify-center min-h-[70vh]">
-            <div class="absolute top-20 right-10 w-64 h-64 bg-brand-light rounded-full blur-[80px] -z-10"></div>
-            <div class="absolute bottom-10 left-10 w-72 h-72 bg-rose-50 rounded-full blur-[80px] -z-10"></div>
+        <!-- Minimalist Hero -->
+        <section class="relative pt-32 pb-20 md:pt-48 md:pb-32 px-4 bg-temple-darker text-white overflow-hidden rounded-b-[3rem] md:rounded-b-[4rem] shadow-2xl">
+            <div class="absolute inset-0 bg-mesh-dark opacity-80"></div>
             
-            <div class="max-w-4xl mx-auto text-center z-10" data-aos="fade-up">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-100 shadow-sm text-brand-gold text-sm font-medium mb-8">
-                    <span class="relative flex h-2 w-2">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-gold opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-gold"></span>
-                    </span>
-                    วัดพัฒนาตัวอย่างดีเด่น
-                </div>
-                <h1 class="font-heading text-5xl md:text-7xl font-bold text-gray-900 tracking-tight leading-[1.1] mb-6">
-                    ศูนย์กลางการศึกษา <br/>
-                    <span class="text-gradient-gold">พระปริยัติธรรม</span>
-                </h1>
-                <p class="text-lg md:text-xl text-gray-500 font-light max-w-2xl mx-auto mb-10 leading-relaxed">
-                    แผนกธรรม และ แผนกบาลี สังกัดแม่กองธรรมสนามหลวง แม่กองบาลีสนามหลวง<br>ตำบลเก่ากลอย อำเภอนากลาง จังหวัดหนองบัวลำภู
-                </p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="#stats" class="w-full sm:w-auto px-8 py-4 bg-brand-dark text-white rounded-full font-heading font-medium hover:bg-brand-red transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                        ดูข้อมูลสถิติและรายชื่อ
-                    </a>
-                    <a href="#about" class="w-full sm:w-auto px-8 py-4 bg-white text-gray-700 rounded-full font-heading font-medium hover:bg-gray-50 transition-all border border-gray-200">
-                        ศึกษาประวัติความเป็นมา
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <section id="about" class="py-20 px-4 bg-white border-t border-gray-100 scroll-mt-24">
-            <div class="max-w-7xl mx-auto">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                    <div class="lg:col-span-7 space-y-8" data-aos="fade-right">
-                        <div>
-                            <span class="text-brand-gold font-bold tracking-widest uppercase text-sm">Our History</span>
-                            <h2 class="font-heading text-3xl md:text-4xl font-bold text-gray-900 mt-2 mb-6">ประวัติความเป็นมา</h2>
-                            <div class="prose prose-lg text-gray-600 font-sans leading-relaxed">
-                                <p class="indent-text text-justify">
-                                    <strong>วัดประสานศรัทธา</strong> เป็นวัดเก่าแก่ที่มีประวัติความเป็นมาอันยาวนานพร้อมกับการก่อตั้งบ้านกุดกระสู้ เดิมตั้งอยู่ที่ริมหนองน้ำกุดกระสู้ ต่อมาในปี พ.ศ. ๒๔๘๑ ชาวบ้านได้ย้ายวัดไปตั้งอยู่ในทิศตะวันออกของหมู่บ้าน ชื่อว่า "วัดจันทรังษี" แต่เนื่องด้วยสถานที่คับแคบและห่างไกลแหล่งน้ำ
-                                </p>
-                                <p class="indent-text text-justify">
-                                    ในปี พ.ศ. ๒๔๙๒ ทายก ทายิกา พร้อมด้วยพระอาจารย์ชัย วิราโค จึงมีมติให้ย้ายวัดมาตั้งอยู่ใกล้ลำห้วยยาง ทิศตะวันตกของหมู่บ้าน เพราะเป็นสถานที่ราบรื่น ร่มเย็น สัปปายะ เหมาะแก่การปฏิบัติธรรม พร้อมกับการก่อสร้างเสนาสนะ ด้วยแรงศรัทธาและความสามัคคีจึงขนานนามวัดว่า <strong>"วัดประสานศรัทธา"</strong> และได้ริเริ่มการศึกษาพระปริยัติธรรมมาจนถึงปัจจุบัน
-                                </p>
-                                <div class="bg-gray-50 border-l-4 border-brand-gold p-5 rounded-r-xl mt-6">
-                                    <h4 class="font-heading font-bold text-gray-900 mb-2">ข้อมูลสถานที่ของสำนักเรียน</h4>
-                                    <ul class="list-disc list-inside text-sm space-y-1 text-gray-600">
-                                        <li>เนื้อที่เฉพาะส่วนสำนักเรียน: ๑ ไร่</li>
-                                        <li>อาคารเรียน ๒ หลัง (ห้องเรียน ๔ ห้อง, ปฏิบัติการ ๑, สมุด ๑, ประชุม ๑, รับรอง ๑)</li>
-                                        <li>แหล่งทุน: พศ., วัดประสานศรัทธา และเงินบริจาค</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+            <div class="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div data-aos="fade-right" data-aos-duration="1000">
+                    <div class="inline-block px-4 py-1.5 rounded-full border border-temple-gold/30 bg-temple-gold/10 text-temple-gold text-xs font-heading font-semibold tracking-widest mb-6">
+                        ACADEMIC YEAR 2569-2570
                     </div>
-
-                    <div class="lg:col-span-5 space-y-6" data-aos="fade-left">
-                        <div class="bento-card p-8 bg-brand-dark text-white text-center">
-                            <i class="fa-solid fa-dharmachakra text-5xl text-brand-gold mb-4"></i>
-                            <h3 class="font-heading text-xl font-bold mb-4 border-b border-white/10 pb-4">สัญลักษณ์</h3>
-                            <p class="text-sm text-brand-light/80 leading-relaxed text-justify">
-                                "รูปธรรมจักรเป็นสัญลักษณ์แห่งพระธรรมและปัญญา อันเป็นรากฐานของการศึกษา ซี่แห่งธรรมจักรสื่อถึงแนวทางแห่งความถูกต้อง วงล้อที่หมุนไม่หยุดหมายถึงการพัฒนาความรู้และจิตใจอย่างต่อเนื่อง ลายไทยประกอบสื่อถึงความเจริญงอกงามแห่งปัญญา"
-                            </p>
-                        </div>
-
-                        <div class="grid grid-cols-1 gap-4">
-                            <div class="bento-card p-6 bg-white border-l-4 border-brand-red">
-                                <h4 class="font-heading font-bold text-gray-900 mb-2"><i class="fa-solid fa-eye text-brand-red mr-2"></i> วิสัยทัศน์</h4>
-                                <p class="text-sm text-gray-600">เป็นศูนย์กลางการศึกษาพระปริยัติธรรมที่มีมาตรฐาน สืบทอดศาสนทายาทผู้เปี่ยมด้วยความรู้คู่คุณธรรม และเป็นหลักยึดเหนี่ยวจิตใจเพื่อความมั่นคงของชุมชน</p>
-                            </div>
-                            <div class="bento-card p-6 bg-white border-l-4 border-brand-gold">
-                                <h4 class="font-heading font-bold text-gray-900 mb-2"><i class="fa-solid fa-fingerprint text-brand-gold mr-2"></i> อัตลักษณ์</h4>
-                                <p class="text-sm text-gray-600 font-medium">"ความรู้ดี ศีลวัตรงดงาม พร้อมนำธรรมสู่ชุมชน"</p>
-                            </div>
-                            <div class="bento-card p-6 bg-white border-l-4 border-gray-800">
-                                <h4 class="font-heading font-bold text-gray-900 mb-2"><i class="fa-solid fa-gem text-gray-800 mr-2"></i> เอกลักษณ์</h4>
-                                <p class="text-sm text-gray-600 font-medium">"สำนักศาสนศึกษาร่วมใจ หล่อหลอมพลังศรัทธา พัฒนาปัญญาศาสนทายาท"</p>
-                            </div>
-                        </div>
+                    <h1 class="font-heading text-5xl md:text-6xl lg:text-8xl font-bold leading-[1.1] mb-6">
+                        สืบสานปัญญา<br>
+                        <span class="text-gradient-gold">รักษาพระธรรม</span>
+                    </h1>
+                    <p class="text-gray-400 text-lg md:text-xl font-light mb-10 max-w-lg leading-relaxed text-balance">
+                        ศูนย์กลางการศึกษาพระปริยัติธรรม แผนกธรรม และบาลี สังกัดแม่กองธรรมสนามหลวง แห่งจังหวัดหนองบัวลำภู
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#dashboard" class="bg-temple-gold text-temple-darker px-8 py-4 rounded-full font-heading font-semibold hover:scale-105 transition-transform shadow-gold-glow">
+                            ดูข้อมูลนักเรียน
+                        </a>
+                        <a href="#about" class="bg-white/5 border border-white/10 text-white px-8 py-4 rounded-full font-heading hover:bg-white/10 transition-colors">
+                            รู้จักเรา
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Decorative Graphic -->
+                <div class="hidden lg:flex justify-center relative" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+                    <div class="w-[30rem] h-[30rem] border border-white/5 rounded-full absolute animate-[spin_40s_linear_infinite]"></div>
+                    <div class="w-[20rem] h-[20rem] border border-temple-gold/20 rounded-full absolute animate-[spin_30s_linear_infinite_reverse]"></div>
+                    <div class="w-64 h-64 glass-dark rounded-full border border-temple-gold/50 flex items-center justify-center relative z-10 shadow-gold-glow backdrop-blur-xl">
+                        <i class="fa-solid fa-book-open-reader text-7xl text-temple-gold"></i>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="personnel" class="py-20 px-4 bg-gray-50 scroll-mt-24">
+        <!-- About (Editorial Style) -->
+        <section id="about" class="py-24 px-4 scroll-mt-20 relative">
             <div class="max-w-7xl mx-auto">
-                <div class="text-center mb-16" data-aos="fade-up">
-                    <span class="text-brand-red font-bold tracking-widest uppercase text-sm">Personnel</span>
-                    <h2 class="font-heading text-3xl md:text-4xl font-bold text-gray-900 mt-2">ทำเนียบผู้บริหารและคณาจารย์</h2>
-                    <p class="text-gray-500 mt-3">สำนักศาสนศึกษาวัดประสานศรัทธา ปี ๒๕๖๙</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10" data-aos="fade-up">
-                    <div class="md:col-span-2 bento-card p-8 bg-gradient-to-br from-white to-amber-50">
-                        <span class="inline-block px-3 py-1 bg-brand-dark text-white text-xs font-bold rounded-full mb-4">เจ้าสำนักศาสนศึกษา</span>
-                        <h3 class="font-heading text-2xl font-bold text-gray-900 mb-1">พระมหาฉัตรชัย ชยญาณเมธี</h3>
-                        <p class="text-brand-gold font-bold text-sm mb-3">ป.ธ.๙, พธ.ม. (อายุ ๔๑ พรรษา ๑๙)</p>
-                        <p class="text-gray-600 text-sm leading-relaxed">
-                            เจ้าอาวาสวัดประสานศรัทธา <br>
-                            รองเจ้าคณะจังหวัดหนองบัวลำภู <br>
-                            เลขานุการประธานศูนย์พระปริยัตินิเทศก์จังหวัดหนองบัวลำภู
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+                    <div class="md:col-span-5" data-aos="fade-up">
+                        <h2 class="font-heading text-4xl md:text-5xl font-bold text-temple-dark mb-4">อัตลักษณ์แห่ง<br>สถานศึกษา</h2>
+                        <div class="w-16 h-1.5 bg-temple-gold rounded-full mb-8"></div>
+                        <p class="text-gray-600 text-lg leading-relaxed text-balance">
+                            มุ่งมั่นสร้างศาสนทายาทให้มีความรู้ความเข้าใจในพระธรรมวินัยอย่างถ่องแท้ เป็นกำลังสำคัญในการเผยแผ่และสืบทอดอายุพระพุทธศาสนา
                         </p>
                     </div>
-                    <div class="bento-card p-6 bg-white border-t-4 border-gray-300">
-                        <span class="text-gray-400 text-xs font-bold mb-2 block">ที่ปรึกษาสำนักเรียน</span>
-                        <h4 class="font-heading text-lg font-bold text-gray-800">พระครูพรหมสีลาภิวัฒน์</h4>
-                        <p class="text-xs text-gray-500 mb-3">น.ธ.เอก (อายุ ๗๔ พรรษา ๕๒)<br>เจ้าคณะตำบลเก่ากลอย เขต ๑</p>
-                        <h4 class="font-heading text-lg font-bold text-gray-800">พระครูสุตวัชโรภาส</h4>
-                        <p class="text-xs text-gray-500">น.ธ.เอก, ป.ธ.๓ (อายุ ๖๘ พรรษา ๓๕)<br>เจ้าคณะตำบลเก่ากลอย เขต ๒</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10" data-aos="fade-up" data-aos-delay="100">
-                    <div class="bento-card p-6 bg-white hover:border-brand-gold">
-                        <span class="text-brand-gold text-xs font-bold mb-1 block">อาจารย์ใหญ่</span>
-                        <h4 class="font-heading text-lg font-bold text-gray-900">พระมหาวิไน ชยเมธี</h4>
-                        <p class="text-xs text-gray-500 mt-1">น.ธ.เอก, ป.ธ.๔</p>
-                    </div>
-                    <div class="bento-card p-6 bg-white hover:border-brand-gold">
-                        <span class="text-brand-gold text-xs font-bold mb-1 block">รองอาจารย์ใหญ่</span>
-                        <h4 class="font-heading text-lg font-bold text-gray-900">พระมหาชินดนัย ฐิตวุฑฺฒิเมธี</h4>
-                        <p class="text-xs text-gray-500 mt-1">น.ธ.เอก, ป.ธ.๔</p>
-                    </div>
-                    <div class="bento-card p-6 bg-white hover:border-brand-gold">
-                        <span class="text-brand-gold text-xs font-bold mb-1 block">ผู้ช่วยเจ้าสำนักฯ</span>
-                        <h4 class="font-heading text-lg font-bold text-gray-900">พระมหายุทธชัย เสฏฺฐจิตฺโต</h4>
-                        <p class="text-xs text-gray-500 mt-1">น.ธ.เอก, ป.ธ.๓, พธ.บ.</p>
-                    </div>
-                    <div class="bento-card p-6 bg-white hover:border-brand-gold">
-                        <span class="text-brand-gold text-xs font-bold mb-1 block">เลขานุการเจ้าสำนักฯ</span>
-                        <h4 class="font-heading text-lg font-bold text-gray-900">พระมหาจักรภัทร คมฺภีรญาณเมธี</h4>
-                        <p class="text-xs text-gray-500 mt-1">น.ธ.เอก, ป.ธ.๔</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-aos="fade-up" data-aos-delay="200">
-                    <div class="bento-card p-6">
-                        <h4 class="font-heading font-bold border-b pb-2 mb-4 text-brand-gold"><i class="fa-solid fa-book-journal-whills"></i> ครูสอนแผนกบาลี</h4>
-                        <ul class="space-y-3 text-sm">
-                            <li><strong class="text-gray-800">พระมหานิพนธ์ จิตฺตทนฺโต</strong> <span class="text-gray-500 block">น.ธ.เอก, ป.ธ.๕</span></li>
-                            <li><strong class="text-gray-800">พระมหาอนุวัต อภิวฑฺฒนเมธี</strong> <span class="text-gray-500 block">น.ธ.เอก, ป.ธ.๓</span></li>
-                        </ul>
-                    </div>
-                    <div class="bento-card p-6">
-                        <h4 class="font-heading font-bold border-b pb-2 mb-4 text-brand-red"><i class="fa-solid fa-scroll"></i> ครูสอนแผนกธรรม</h4>
-                        <ul class="space-y-3 text-sm">
-                            <li><strong class="text-gray-800">พระมหากันต์นภัทร ธีรปญฺโญ</strong> <span class="text-gray-500 block">น.ธ.เอก, ป.ธ.๔, พธ.บ.</span></li>
-                            <li><strong class="text-gray-800">พระมหาสนธยา สนฺตกาโย</strong> <span class="text-gray-500 block">น.ธ.เอก, ป.ธ.๓</span></li>
-                            <li><strong class="text-gray-800">สามเณรพุฒิพงษ์ ปัญญา</strong> <span class="text-gray-500 block">น.ธ.เอก, ป.ธ.๓</span></li>
-                            <li><strong class="text-gray-800">สามเณรเจษฎา เข็มลา</strong> <span class="text-gray-500 block">น.ธ.เอก, ป.ธ.๔</span></li>
-                        </ul>
-                    </div>
-                    <div class="bento-card p-6 bg-gray-100/50">
-                        <h4 class="font-heading font-bold border-b pb-2 mb-4 text-gray-700"><i class="fa-solid fa-chalkboard-user"></i> ครูสอนพิเศษ</h4>
-                        <ul class="space-y-3 text-sm">
-                            <li><strong class="text-gray-800">พระมหาวันเพ็ญ สารโท</strong> <span class="text-gray-500 block">น.ธ.เอก, ป.ธ.๔, ร.ม.<br>(เจ้าคณะตำบลนากลาง)</span></li>
-                            <li><strong class="text-gray-800">พระมหาปรเมศร์ จรณธมฺโม</strong> <span class="text-gray-500 block">น.ธ.เอก, ป.ธ.๔, ร.ม.<br>(รองเจ้าคณะตำบลนากลาง)</span></li>
-                        </ul>
+                    
+                    <div class="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Bento Info Cards -->
+                        <div class="glass-light p-8 rounded-3xl hover-lift" data-aos="fade-up" data-aos-delay="100">
+                            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-6">
+                                <i class="fa-solid fa-eye text-temple-dark text-xl"></i>
+                            </div>
+                            <h3 class="font-heading text-xl font-bold text-temple-dark mb-3">วิสัยทัศน์</h3>
+                            <p class="text-gray-600 text-sm leading-relaxed">ศูนย์กลางการศึกษาพระปริยัติธรรมที่มีมาตรฐาน สืบทอดศาสนทายาทผู้เปี่ยมด้วยความรู้คู่คุณธรรม</p>
+                        </div>
+                        <div class="glass-light p-8 rounded-3xl hover-lift" data-aos="fade-up" data-aos-delay="200">
+                            <div class="w-12 h-12 rounded-full bg-rose-50 flex items-center justify-center mb-6">
+                                <i class="fa-solid fa-fingerprint text-temple-crimson text-xl"></i>
+                            </div>
+                            <h3 class="font-heading text-xl font-bold text-temple-dark mb-3">อัตลักษณ์</h3>
+                            <p class="text-temple-crimson font-medium text-sm leading-relaxed">"ความรู้ดี ศีลวัตรงดงาม พร้อมนำธรรมสู่ชุมชน"</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="rules" class="py-20 px-4 bg-white border-t border-gray-100 scroll-mt-24">
-            <div class="max-w-4xl mx-auto">
-                <div class="text-center mb-12" data-aos="fade-up">
-                    <h2 class="font-heading text-3xl md:text-4xl font-bold text-gray-900">ระเบียบและปฏิทินการศึกษา</h2>
-                    <p class="text-gray-500 mt-2">คลิกที่หัวข้อเพื่อดูรายละเอียดเพิ่มเติม</p>
+        <!-- Personnel (Sleek List Style) -->
+        <section id="personnel" class="py-24 px-4 bg-white/50 border-y border-gray-100 scroll-mt-20">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6" data-aos="fade-up">
+                    <div>
+                        <h2 class="font-heading text-4xl md:text-5xl font-bold text-temple-dark mb-2">ทำเนียบบุคลากร</h2>
+                        <p class="text-gray-500">คณะผู้บริหารและคณาจารย์ ประจำปีการศึกษา ๒๕๖๙</p>
+                    </div>
+                    <div class="bg-temple-gold/10 text-temple-gold px-4 py-2 rounded-full text-sm font-heading font-semibold">
+                        สำนักเรียนวัดประสานศรัทธา
+                    </div>
                 </div>
 
-                <div class="space-y-4" data-aos="fade-up">
-                    <details class="group bento-card bg-gray-50 cursor-pointer">
-                        <summary class="p-6 font-heading font-bold text-lg text-gray-900 flex justify-between items-center">
-                            <span><i class="fa-solid fa-scale-balanced text-brand-dark mr-3"></i> ระเบียบสำนักศาสนศึกษา พ.ศ. ๒๕๖๙</span>
-                            <i class="fa-solid fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
-                        </summary>
-                        <div class="p-6 pt-0 text-gray-600 text-sm md:text-base border-t border-gray-200 mt-2 bg-white">
-                            <p class="mb-4 mt-4 font-medium text-brand-dark">สรุปสาระสำคัญว่าด้วยการบริหารและการจัดการศึกษาพระปริยัติธรรม:</p>
-                            <ul class="list-disc list-inside space-y-2 ml-2">
-                                <li><strong>หมวด ๒:</strong> บริหารงานโดยคณะกรรมการบริหารฯ ซึ่งมีเจ้าสำนักเป็นประธาน</li>
-                                <li><strong>หมวด ๓:</strong> จัดการศึกษา ๒ แผนก คือ ธรรม (ตรี-เอก) และ บาลี (๑-๒ ถึง ป.ธ.๙) โดยผู้สำเร็จการศึกษาจะได้รับสิทธิ์แห่งวิทยฐานะตาม พ.ร.บ. การศึกษาฯ พ.ศ. ๒๕๖๒</li>
-                                <li><strong>หมวด ๔:</strong> บุคลากรต้องปฏิบัติหน้าที่ด้วยความวิริยะอุตสาหะ และปฏิบัติตนเป็นแบบอย่างที่ดีตามหลักพระธรรมวินัย</li>
-                                <li><strong>หมวด ๕ หน้าที่ผู้เรียน:</strong> ต้องมีเวลาเรียนไม่น้อยกว่าร้อยละ ๘๐ จึงจะมีสิทธิ์เข้าสอบไล่ในสนามหลวง และห้ามประพฤติตนในทางที่เสื่อมเสียต่อสมณสารูป</li>
-                                <li><strong>หมวด ๖ การลงทัณฑ์:</strong> ๑. ตักเตือน/ทำทัณฑ์บน ๒. งดสิทธิ์รับทุน ๓. ส่งตัวคืนต้นสังกัด ๔. ให้ออกจากสำนัก</li>
-                            </ul>
+                <!-- Executive Highlights -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                    <div class="lg:col-span-2 glass-light rounded-3xl p-8 md:p-12 border-l-[6px] border-temple-gold relative overflow-hidden group hover:shadow-premium transition" data-aos="fade-up">
+                        <div class="absolute right-0 bottom-0 opacity-[0.03] transform translate-x-1/4 translate-y-1/4 pointer-events-none">
+                            <i class="fa-solid fa-crown text-[15rem]"></i>
                         </div>
-                    </details>
+                        <span class="text-xs font-heading font-bold text-temple-gold tracking-widest uppercase mb-2 block">เจ้าสำนักศาสนศึกษา</span>
+                        <h3 class="font-heading text-3xl font-bold text-temple-dark mb-1">พระมหาฉัตรชัย ชยญาณเมธี</h3>
+                        <p class="text-temple-gold font-bold mb-6">ป.ธ.๙, พธ.ม.</p>
+                        <ul class="space-y-2 text-sm text-gray-600 border-t border-gray-100 pt-6">
+                            <li class="flex items-center"><i class="fa-solid fa-check text-temple-gold mr-3"></i> เจ้าอาวาสวัดประสานศรัทธา</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-temple-gold mr-3"></i> รองเจ้าคณะจังหวัดหนองบัวลำภู</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-temple-gold mr-3"></i> เลขานุการประธานศูนย์พระปริยัตินิเทศก์จังหวัด</li>
+                        </ul>
+                    </div>
 
-                    <details class="group bento-card bg-gray-50 cursor-pointer">
-                        <summary class="p-6 font-heading font-bold text-lg text-gray-900 flex justify-between items-center">
-                            <span><i class="fa-regular fa-calendar-days text-brand-gold mr-3"></i> โครงสร้างเวลาเรียนและแผนการสอน</span>
-                            <i class="fa-solid fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
-                        </summary>
-                        <div class="p-6 pt-0 text-gray-600 text-sm md:text-base border-t border-gray-200 mt-2 bg-white">
-                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col gap-6">
+                        <div class="glass-light p-6 rounded-3xl border border-gray-100 hover:shadow-premium transition" data-aos="fade-up" data-aos-delay="100">
+                            <span class="text-xs font-heading font-bold text-gray-400 mb-1 block">ที่ปรึกษา (เขต ๑)</span>
+                            <h4 class="font-heading text-lg font-bold text-temple-dark">พระครูพรหมสีลาภิวัฒน์</h4>
+                            <p class="text-xs text-gray-500 mt-1">เจ้าคณะตำบลเก่ากลอย (น.ธ.เอก)</p>
+                        </div>
+                        <div class="glass-light p-6 rounded-3xl border border-gray-100 hover:shadow-premium transition" data-aos="fade-up" data-aos-delay="200">
+                            <span class="text-xs font-heading font-bold text-gray-400 mb-1 block">ที่ปรึกษา (เขต ๒)</span>
+                            <h4 class="font-heading text-lg font-bold text-temple-dark">พระครูสุตพัชโรภาส</h4>
+                            <p class="text-xs text-gray-500 mt-1">เจ้าคณะตำบลเก่ากลอย (ป.ธ.๓)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Grid for Teachers -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Management -->
+                    <div class="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden hover-lift" data-aos="fade-right">
+                        <div class="absolute top-0 right-0 p-8 opacity-20"><i class="fa-solid fa-sitemap text-5xl"></i></div>
+                        <h4 class="font-heading text-xl font-bold mb-6 text-temple-gold border-b border-white/10 pb-4">ฝ่ายบริหารสำนักเรียน</h4>
+                        <div class="space-y-5">
+                            <div>
+                                <p class="text-xs text-gray-400 font-heading mb-1">อาจารย์ใหญ่</p>
+                                <p class="font-bold">พระมหาวิไน ชยเมธี <span class="text-temple-gold font-normal text-sm ml-2">ป.ธ.๔</span></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 font-heading mb-1">รองอาจารย์ใหญ่</p>
+                                <p class="font-bold">พระมหาชินดนัย ฐิตวุฑฺฒิเมธี <span class="text-temple-gold font-normal text-sm ml-2">ป.ธ.๔</span></p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <h5 class="font-bold text-brand-red mb-2">แผนกธรรม</h5>
-                                    <p class="text-sm mb-2"><strong>นักธรรมตรี:</strong> เรียน ๗ พ.ค. - ๒๓ ต.ค. ๒๕๖๙ (๒ รอบ/วัน: ๐๘.๐๐-๑๑.๐๐ น. และ ๑๘.๐๐-๑๙.๐๐ น.)</p>
-                                    <p class="text-sm"><strong>นักธรรมโท-เอก:</strong> เรียน ๗ พ.ค. - ๒๙ พ.ย. ๒๕๖๙ (เวลาเรียนเช่นเดียวกับชั้นตรี)</p>
+                                    <p class="text-xs text-gray-400 font-heading mb-1">ผู้ช่วยเจ้าสำนัก</p>
+                                    <p class="font-bold text-sm">พระมหายุทธชัย <span class="text-temple-gold font-normal text-xs block">ป.ธ.๓</span></p>
                                 </div>
                                 <div>
-                                    <h5 class="font-bold text-brand-gold mb-2">แผนกบาลี แบ่งเป็น ๔ ภาค</h5>
-                                    <ul class="text-sm space-y-1 list-disc list-inside">
-                                        <li><strong>ภาควิสาขะ:</strong> ๗ พ.ค. - ๒๙ ก.ค. ๒๕๖๙</li>
-                                        <li><strong>ภาคพรรษา:</strong> ๓๐ ก.ค. - ๒๔ พ.ย. ๒๕๖๙</li>
-                                        <li><strong>ภาคปวารณา:</strong> ๒๕ พ.ย. ๒๕๖๙ - ๒๑ ก.พ. ๒๕๗๐</li>
-                                        <li><strong>ภาคมาฆบูชา:</strong> ทบทวนสอบซ่อม</li>
-                                    </ul>
-                                    <p class="text-sm mt-2 font-medium">เวลาเรียน: ๑๒.๓๐ - ๑๗.๐๐ น.</p>
+                                    <p class="text-xs text-gray-400 font-heading mb-1">เลขานุการ</p>
+                                    <p class="font-bold text-sm">พระมหาจักรภัทร <span class="text-temple-gold font-normal text-xs block">ป.ธ.๔</span></p>
                                 </div>
                             </div>
                         </div>
-                    </details>
+                    </div>
+
+                    <!-- Teachers -->
+                    <div class="grid grid-rows-2 gap-6">
+                        <div class="glass-light rounded-3xl p-6 border-l-[4px] border-temple-gold hover-lift flex flex-col justify-center" data-aos="fade-left">
+                            <h4 class="font-heading font-bold text-temple-dark mb-3 flex items-center"><i class="fa-solid fa-book-open text-temple-gold mr-2"></i> ครูสอนแผนกบาลี</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-gray-50 border border-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium">พระมหานิพนธ์ จิตฺตทนฺโต (ป.ธ.๕)</span>
+                                <span class="bg-gray-50 border border-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium">พระมหาอนุวัต อนุวฑฺฒนเมธี (ป.ธ.๓)</span>
+                            </div>
+                        </div>
+                        <div class="glass-light rounded-3xl p-6 border-l-[4px] border-temple-crimson hover-lift flex flex-col justify-center" data-aos="fade-left" data-aos-delay="100">
+                            <h4 class="font-heading font-bold text-temple-dark mb-3 flex items-center"><i class="fa-solid fa-scroll text-temple-crimson mr-2"></i> ครูสอนแผนกธรรม</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-gray-50 border border-gray-100 text-gray-700 px-3 py-1 rounded-lg text-xs font-medium">พระมหากันต์นภัทร (ป.ธ.๔)</span>
+                                <span class="bg-gray-50 border border-gray-100 text-gray-700 px-3 py-1 rounded-lg text-xs font-medium">พระมหาสนธยา (ป.ธ.๓)</span>
+                                <span class="bg-gray-50 border border-gray-100 text-gray-700 px-3 py-1 rounded-lg text-xs font-medium">สามเณรพุฒิพงษ์</span>
+                                <span class="bg-gray-50 border border-gray-100 text-gray-700 px-3 py-1 rounded-lg text-xs font-medium">สามเณรเจษฎา</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="stats" class="py-20 px-4 bg-gray-50 border-t border-gray-200 scroll-mt-24">
-            <div class="max-w-7xl mx-auto">
-                <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-12" data-aos="fade-up">
+        <!-- THE BENTO DASHBOARD (State of the Art) -->
+        <main id="dashboard" class="max-w-7xl mx-auto px-4 py-24 w-full scroll-mt-20">
+            
+            <!-- Dashboard Header -->
+            <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6" data-aos="fade-up">
+                <div>
+                    <h2 class="font-heading text-4xl md:text-5xl font-bold text-temple-dark mb-2">ระบบสถิติสารสนเทศ</h2>
+                    <p class="text-gray-500 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> ดึงข้อมูล Real-time จากฝ่ายทะเบียน</p>
+                </div>
+                <button onclick="fetchData()" id="refreshBtn" class="bg-temple-dark text-white hover:bg-black px-6 py-3 rounded-full font-heading text-sm transition-all shadow-lg flex items-center group">
+                    <i class="fa-solid fa-rotate-right mr-2 transition-transform duration-500 group-hover:rotate-180" id="refreshIcon"></i>
+                    <span id="refreshText">ซิงค์ข้อมูลล่าสุด</span>
+                </button>
+            </div>
+
+            <!-- Bento Grid Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 mb-12 h-auto md:h-[400px]">
+                
+                <!-- Main Total Box (Spans 2x2 on Desktop) -->
+                <div class="md:col-span-2 md:row-span-2 bg-temple-dark rounded-[2rem] p-8 md:p-10 text-white relative overflow-hidden flex flex-col justify-end shadow-premium hover:shadow-2xl transition-shadow" data-aos="zoom-in">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-temple-gold rounded-full blur-[100px] opacity-20"></div>
+                    <i class="fa-solid fa-users text-4xl text-temple-gold mb-auto opacity-80"></i>
                     <div>
-                        <span class="text-brand-dark font-bold tracking-widest uppercase text-sm">Live Database</span>
-                        <h2 class="font-heading text-3xl md:text-4xl font-bold text-gray-900 mt-2">ระบบฐานข้อมูลนักเรียน</h2>
-                        <p class="text-gray-500">ซิงโครไนซ์ข้อมูลจากฝ่ายทะเบียนแบบเรียลไทม์ (Google Sheets)</p>
-                    </div>
-                    <button onclick="fetchGoogleSheetData()" id="refreshBtn" class="group flex items-center gap-2 bg-white border border-gray-200 px-6 py-3 rounded-full hover:border-brand-gold hover:text-brand-gold transition-all shadow-sm">
-                        <i class="fa-solid fa-rotate-right text-gray-400 group-hover:text-brand-gold transition-colors" id="refreshIcon"></i>
-                        <span id="refreshText" class="font-medium text-gray-700 group-hover:text-brand-gold font-heading">อัปเดตข้อมูล</span>
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
-                    <div class="bento-card p-6 bg-brand-dark text-white text-center lg:col-span-2" data-aos="zoom-in" data-aos-delay="0">
-                        <span class="text-brand-light font-medium tracking-wide uppercase text-xs mb-2 block">นักเรียนรวมทั้งสิ้น</span>
-                        <div class="flex items-baseline justify-center gap-2">
-                            <span id="totalStudents" class="font-heading text-6xl font-bold">๐</span>
-                            <span class="text-brand-light">รูป</span>
-                        </div>
-                    </div>
-                    <div class="bento-card p-6 bg-white border-b-4 border-brand-red text-center" data-aos="zoom-in" data-aos-delay="100">
-                        <span class="text-gray-500 font-medium tracking-wide uppercase text-xs mb-2 block">แผนกธรรม</span>
-                        <div class="flex items-baseline justify-center gap-2">
-                            <span id="totalNakTham" class="font-heading text-5xl font-bold text-brand-red">๐</span>
-                            <span class="text-gray-500 text-sm">รูป</span>
-                        </div>
-                    </div>
-                    <div class="bento-card p-6 bg-white border-b-4 border-brand-gold text-center" data-aos="zoom-in" data-aos-delay="200">
-                        <span class="text-gray-500 font-medium tracking-wide uppercase text-xs mb-2 block">แผนกบาลี</span>
-                        <div class="flex items-baseline justify-center gap-2">
-                            <span id="totalPali" class="font-heading text-5xl font-bold text-brand-gold">๐</span>
-                            <span class="text-gray-500 text-sm">รูป</span>
-                        </div>
-                    </div>
-                    <div class="bento-card p-6 bg-white border-b-4 border-gray-400 text-center flex flex-col justify-center gap-2" data-aos="zoom-in" data-aos-delay="300">
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="text-gray-500 font-medium">พระภิกษุ</span>
-                            <span id="totalMonks" class="font-heading font-bold text-lg text-gray-800">๐ รูป</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm pt-1">
-                            <span class="text-gray-500 font-medium">สามเณร</span>
-                            <span id="totalNovices" class="font-heading font-bold text-lg text-gray-800">๐ รูป</span>
+                        <p class="text-gray-400 font-heading text-lg mb-2">จำนวนนักเรียนรวมทั้งสิ้น</p>
+                        <div class="flex items-baseline gap-3">
+                            <span id="statTotal" class="text-7xl md:text-8xl font-bold font-heading text-white tracking-tighter">๐</span>
+                            <span class="text-temple-gold text-xl font-medium">รูป</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-16">
-                    <div class="bento-card p-6" data-aos="fade-up">
-                        <h3 class="font-heading text-lg font-bold text-gray-800 mb-6 border-l-4 border-brand-gold pl-3">สัดส่วนผู้เรียน (ร้อยละ)</h3>
-                        <div class="relative h-64 w-full flex justify-center">
-                            <canvas id="pieChart"></canvas>
-                        </div>
+                <!-- Sub Stats -->
+                <div class="glass-light rounded-[2rem] p-6 flex flex-col justify-between hover-lift" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex justify-between items-start">
+                        <p class="text-gray-500 font-heading text-sm">พระภิกษุ</p>
+                        <div class="w-8 h-8 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center"><i class="fa-solid fa-person-praying text-sm"></i></div>
                     </div>
-                    <div class="bento-card p-6" data-aos="fade-up" data-aos-delay="100">
-                        <h3 class="font-heading text-lg font-bold text-gray-800 mb-6 border-l-4 border-brand-red pl-3">จำนวนนักเรียนแยกชั้น</h3>
-                        <div class="relative h-64 w-full">
-                            <canvas id="barChart"></canvas>
-                        </div>
+                    <div class="mt-4">
+                        <span id="statMonk" class="text-4xl font-bold font-heading text-temple-dark">๐</span>
                     </div>
                 </div>
 
-                <div class="space-y-12">
-                    <div class="text-center">
-                        <h3 class="font-heading text-2xl font-bold text-gray-900 inline-block border-b-2 border-brand-red pb-2">ทำเนียบนักเรียน แผนกธรรม</h3>
+                <div class="glass-light rounded-[2rem] p-6 flex flex-col justify-between hover-lift" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex justify-between items-start">
+                        <p class="text-gray-500 font-heading text-sm">สามเณร</p>
+                        <div class="w-8 h-8 rounded-full bg-yellow-50 text-yellow-600 flex items-center justify-center"><i class="fa-solid fa-hands-praying text-sm"></i></div>
                     </div>
-                    <div id="nakThamListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="col-span-full py-16 flex flex-col items-center justify-center bg-white rounded-3xl border border-gray-100">
-                            <div class="loader-ring mb-4"></div>
-                            <p class="text-gray-400 font-medium">กำลังเตรียมข้อมูลแผนกธรรม...</p>
+                    <div class="mt-4">
+                        <span id="statNovice" class="text-4xl font-bold font-heading text-temple-dark">๐</span>
+                    </div>
+                </div>
+
+                <div class="glass-light rounded-[2rem] p-6 flex flex-col justify-between hover-lift border-b-[4px] border-temple-crimson" data-aos="fade-up" data-aos-delay="150">
+                    <p class="text-gray-500 font-heading text-sm mb-4">แผนกธรรม</p>
+                    <div class="flex items-end justify-between">
+                        <span id="statTham" class="text-5xl font-bold font-heading text-temple-crimson">๐</span>
+                        <i class="fa-solid fa-scroll text-gray-200 text-3xl"></i>
+                    </div>
+                </div>
+
+                <div class="glass-light rounded-[2rem] p-6 flex flex-col justify-between hover-lift border-b-[4px] border-temple-gold" data-aos="fade-up" data-aos-delay="250">
+                    <p class="text-gray-500 font-heading text-sm mb-4">แผนกบาลี</p>
+                    <div class="flex items-end justify-between">
+                        <span id="statPali" class="text-5xl font-bold font-heading text-temple-gold">๐</span>
+                        <i class="fa-solid fa-book-journal-whills text-gray-200 text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section (Sleek design) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-20">
+                <div class="glass-light rounded-[2rem] p-6 md:p-8" data-aos="fade-right">
+                    <h3 class="font-heading font-bold text-temple-dark mb-6 text-lg">สัดส่วนผู้เรียน</h3>
+                    <div class="relative h-64 w-full"><canvas id="pieChart"></canvas></div>
+                </div>
+                <div class="glass-light rounded-[2rem] p-6 md:p-8" data-aos="fade-left">
+                    <h3 class="font-heading font-bold text-temple-dark mb-6 text-lg">จำนวนแยกตามชั้นเรียน</h3>
+                    <div class="relative h-64 w-full"><canvas id="barChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Dynamic Data Roster (Ultra clean accordion/grid style) -->
+            <div id="roster" class="mb-10">
+                <div class="text-center mb-12" data-aos="fade-up">
+                    <h2 class="font-heading text-3xl md:text-4xl font-bold text-temple-dark mb-3">ทำเนียบรายชื่อนักเรียน</h2>
+                    <p class="text-gray-500">จำแนกตามแผนกและจัดเรียงตามพรรษา</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Nak Tham Column -->
+                    <div data-aos="fade-up" data-aos-delay="100">
+                        <div class="bg-temple-crimson rounded-[2rem] rounded-b-none p-6 text-white flex items-center justify-between">
+                            <h3 class="font-heading text-xl font-bold">แผนกธรรม</h3>
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-xs">แม่กองธรรมฯ</span>
+                        </div>
+                        <div class="glass-light rounded-[2rem] rounded-t-none p-6 md:p-8 border-x border-b border-gray-200 shadow-sm min-h-[400px]" id="listTham">
+                            <!-- Loader Initial State -->
+                            <div class="flex flex-col items-center justify-center h-full py-20 text-gray-400">
+                                <div class="loader-ring mb-4"></div>
+                                <p class="animate-pulse font-heading">กำลังเชื่อมต่อฐานข้อมูล...</p>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="text-center mt-12 pt-8 border-t">
-                        <h3 class="font-heading text-2xl font-bold text-gray-900 inline-block border-b-2 border-brand-gold pb-2">ทำเนียบนักเรียน แผนกบาลี</h3>
-                    </div>
-                    <div id="paliListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="col-span-full py-16 flex flex-col items-center justify-center bg-white rounded-3xl border border-gray-100">
-                            <div class="loader-ring mb-4"></div>
-                            <p class="text-gray-400 font-medium">กำลังเตรียมข้อมูลแผนกบาลี...</p>
+
+                    <!-- Pali Column -->
+                    <div data-aos="fade-up" data-aos-delay="200">
+                        <div class="bg-temple-gold rounded-[2rem] rounded-b-none p-6 text-temple-darker flex items-center justify-between">
+                            <h3 class="font-heading text-xl font-bold">แผนกบาลี</h3>
+                            <span class="bg-black/10 px-3 py-1 rounded-full text-xs font-semibold">แม่กองบาลีฯ</span>
+                        </div>
+                        <div class="glass-light rounded-[2rem] rounded-t-none p-6 md:p-8 border-x border-b border-gray-200 shadow-sm min-h-[400px]" id="listPali">
+                             <!-- Loader Initial State -->
+                             <div class="flex flex-col items-center justify-center h-full py-20 text-gray-400">
+                                <div class="loader-ring mb-4" style="border-color: #cbd5e1 transparent #cbd5e1 transparent;"></div>
+                                <p class="animate-pulse font-heading">กำลังเชื่อมต่อฐานข้อมูล...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </main>
 
-        <footer id="contact" class="bg-brand-dark text-gray-300 py-16 mt-auto border-t-4 border-brand-gold relative overflow-hidden">
-            <div class="absolute inset-0 bg-black opacity-20"></div>
-            <div class="max-w-6xl mx-auto px-4 relative z-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-                <div class="text-center md:text-left">
-                    <i class="fa-solid fa-vihara text-4xl text-brand-gold mb-4 block"></i>
-                    <h4 class="font-heading text-2xl text-white font-bold mb-2">สำนักศาสนศึกษาวัดประสานศรัทธา</h4>
-                    <p class="text-sm mb-2 text-gray-400">สำนักปฏิบัติธรรมประจำจังหวัดหนองบัวลำภู แห่งที่ ๒๒</p>
-                    <p class="text-sm">หมู่ ๒ ตำบลเก่ากลอย อำเภอนากลาง จังหวัดหนองบัวลำภู ๓๙๓๕๐</p>
+        <!-- Minimalist Footer -->
+        <footer class="bg-temple-darker pt-20 pb-10 text-center relative overflow-hidden mt-auto">
+            <div class="absolute inset-0 bg-mesh-dark opacity-30"></div>
+            <div class="relative z-10 max-w-4xl mx-auto px-4">
+                <i class="fa-solid fa-dharmachakra text-4xl text-temple-gold opacity-50 mb-6"></i>
+                <h4 class="font-heading text-2xl font-bold text-white mb-2 tracking-wide">สำนักศาสนศึกษาวัดประสานศรัทธา</h4>
+                <p class="text-gray-500 text-sm mb-12">ตำบลเก่ากลอย อำเภอนากลาง จังหวัดหนองบัวลำภู ๓๙๓๕๐</p>
+                
+                <div class="border-t border-white/10 pt-8 text-xs text-gray-600 flex flex-col md:flex-row justify-center items-center gap-2">
+                    <span>Designed & Engineered by</span>
+                    <span class="text-temple-gold font-heading tracking-wider">พระมหาจักรภัทร คมฺภีรญาณเมธี</span>
                 </div>
-                <div class="bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-sm text-sm">
-                    <h5 class="font-heading text-white font-bold mb-4 border-b border-white/10 pb-2"><i class="fa-regular fa-address-card mr-2"></i> ช่องทางการติดต่อสื่อสาร</h5>
-                    <ul class="space-y-3">
-                        <li><i class="fa-brands fa-facebook text-[#1877F2] mr-2"></i> เพจ: วัดประสานศรัทธา</li>
-                        <li><i class="fa-brands fa-line text-[#00B900] mr-2"></i> Line ID: 0987825944 (เจ้าสำนัก)</li>
-                        <li><i class="fa-brands fa-line text-[#00B900] mr-2"></i> Line ID: pat007002 (เลขานุการ)</li>
-                        <li><i class="fa-solid fa-phone text-gray-400 mr-2"></i> โทร: ๐๘๙-๗๘๒๕๙๔๔</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="text-center text-xs text-gray-500 mt-12 relative z-10">
-                <p>Designed & Developed by <span class="text-brand-gold font-medium">พระมหาจักรภัทร คมฺภีรญาณเมธี</span></p>
             </div>
         </footer>
     </div>
 
-    <button id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 right-6 w-12 h-12 bg-white text-gray-800 rounded-full shadow-lg border border-gray-100 flex items-center justify-center transform translate-y-20 opacity-0 transition-all duration-300 z-50 hover:shadow-xl hover:text-brand-gold">
-        <i class="fa-solid fa-arrow-up"></i>
-    </button>
-
-    <div id="toast" class="fixed top-6 right-6 md:top-10 md:right-10 transform -translate-y-20 opacity-0 transition-all duration-500 z-[100] bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center text-sm font-medium">
-        <i class="fa-solid fa-circle-check text-green-400 text-lg mr-3"></i>
-        <span id="toastMsg">อัปเดตข้อมูลสำเร็จ</span>
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 transform translate-y-24 opacity-0 transition-all duration-500 z-[100] bg-temple-dark text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10 backdrop-blur-md">
+        <div id="toastIcon" class="w-8 h-8 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center"><i class="fa-solid fa-check"></i></div>
+        <span id="toastMsg" class="font-heading text-sm">อัปเดตเรียบร้อย</span>
     </div>
 
+    <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Initialize AOS
-        AOS.init({ once: true, offset: 50 });
+        // Init Animation
+        AOS.init({ once: true, offset: 30, duration: 800 });
 
-        // Google Sheets Config
-        const sheetId = '1Kc-No3IS8H5bT0wUcubRBI31x-b3SIc8L_QzMerEZ2k';
-        const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+        // Configuration
+        const GOOGLE_SHEET_ID = '1RNYN_IRrEr9cQ56NMD2MOZGExsaihFOjNH4cObMAhHY';
+        const CSV_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/export?format=csv`;
 
-        let myPieChart = null;
-        let myBarChart = null;
-
-        const classNakTham = ['นักธรรมตรี', 'นักธรรมโท', 'นักธรรมเอก', 'ธรรมศึกษาตรี', 'ธรรมศึกษาโท', 'ธรรมศึกษาเอก'];
-        const classPali = ['ประโยค ๑-๒', 'ป.ธ.๑-๒', 'ป.ธ.๓', 'ป.ธ.๔', 'ป.ธ.๕', 'ป.ธ.๖', 'ป.ธ.๗', 'ป.ธ.๘', 'ป.ธ.๙'];
-        const classOrderList = [...classNakTham, ...classPali];
+        let chartPie, chartBar;
+        const CLASS_ORDER = [
+            'นักธรรมตรี', 'นักธรรมโท', 'นักธรรมเอก', 'ธรรมศึกษาตรี', 'ธรรมศึกษาโท', 'ธรรมศึกษาเอก',
+            'ประโยค ๑-๒', 'ป.ธ.๑-๒', 'ป.ธ.๓', 'ป.ธ.๔', 'ป.ธ.๕', 'ป.ธ.๖', 'ป.ธ.๗', 'ป.ธ.๘', 'ป.ธ.๙'
+        ];
 
         // UI Interactions
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('navbar');
-            const navWrap = document.getElementById('navWrapper');
-            const backToTop = document.getElementById('backToTop');
-            
-            if (window.scrollY > 50) {
-                navWrap.classList.remove('py-4'); navWrap.classList.add('py-2');
-                nav.classList.add('shadow-lg', 'bg-white/95');
-                backToTop.classList.remove('translate-y-20', 'opacity-0');
-                backToTop.classList.add('translate-y-0', 'opacity-100');
+            if (window.scrollY > 100) {
+                nav.classList.add('bg-temple-dark/90', 'backdrop-blur-xl', 'border-white/10', 'translate-y-2');
+                nav.classList.remove('glass-dark', 'translate-y-0');
             } else {
-                navWrap.classList.add('py-4'); navWrap.classList.remove('py-2');
-                nav.classList.remove('shadow-lg', 'bg-white/95');
-                backToTop.classList.add('translate-y-20', 'opacity-0');
-                backToTop.classList.remove('translate-y-0', 'opacity-100');
+                nav.classList.add('glass-dark', 'translate-y-0');
+                nav.classList.remove('bg-temple-dark/90', 'backdrop-blur-xl', 'translate-y-2');
             }
         });
 
         function enterWebsite() {
-            const welcomeScreen = document.getElementById('welcomeScreen');
-            const welcomeContent = document.getElementById('welcomeContent');
-            const mainContent = document.getElementById('mainContent');
+            const splash = document.getElementById('welcomeScreen');
+            const main = document.getElementById('mainContent');
             
-            welcomeContent.classList.add('scale-95', 'opacity-0');
-            welcomeScreen.classList.add('reveal-up');
-            
+            splash.classList.add('opacity-0');
             setTimeout(() => {
-                welcomeScreen.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-                window.scrollTo(0,0);
-                setTimeout(() => {
-                    mainContent.classList.remove('opacity-0');
-                    AOS.refresh();
-                    fetchGoogleSheetData(); // Start fetching dynamic data!
-                }, 50);
+                splash.style.display = 'none';
+                main.classList.remove('hidden');
+                
+                // Trigger reflow
+                void main.offsetWidth;
+                main.classList.remove('opacity-0');
+                
+                AOS.refresh();
+                fetchData(); // Fetch data once inside
             }, 800);
         }
 
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').innerText = message;
-            toast.innerHTML = `<i class="fa-solid ${isError ? 'fa-circle-xmark text-red-400' : 'fa-circle-check text-green-400'} text-lg mr-3"></i> <span>${message}</span>`;
-            toast.classList.remove('-translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('-translate-y-20', 'opacity-0');
-            }, 3000);
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            const icon = document.getElementById('toastIcon');
+            
+            if(type === 'error') {
+                icon.className = 'w-8 h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center';
+                icon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+            } else {
+                icon.className = 'w-8 h-8 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center';
+                icon.innerHTML = '<i class="fa-solid fa-check"></i>';
+            }
+
+            t.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => t.classList.add('translate-y-24', 'opacity-0'), 3000);
         }
 
-        // Data Processing Logic
-        function toThaiNumerals(num) {
-            if (num === null || num === undefined) return '';
-            const thaiNumbers = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙'];
-            return num.toString().replace(/\d/g, match => thaiNumbers[match]);
-        }
+        // Helper: Thai Numerals
+        const toThaiNum = (num) => {
+            if (num == null) return '';
+            const t = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙'];
+            return num.toString().replace(/\d/g, m => t[m]);
+        };
 
-        function fetchGoogleSheetData() {
+        const animateNum = (id, target) => {
+            const el = document.getElementById(id);
+            let current = 0;
+            const duration = 1500; 
+            const step = Math.max(1, Math.floor(target / (duration / 16)));
+            
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                el.innerText = toThaiNum(current);
+            }, 16);
+        };
+
+        // Data Logic
+        function fetchData() {
             const btnText = document.getElementById('refreshText');
             const icon = document.getElementById('refreshIcon');
             
-            btnText.innerText = 'กำลังโหลด...';
+            btnText.innerText = 'Syncing...';
             icon.classList.add('fa-spin');
             
-            Papa.parse(csvUrl, {
+            // Set Loading Skeletons
+            document.getElementById('listTham').innerHTML = '<div class="space-y-4"><div class="h-12 bg-gray-200 rounded-xl shimmer"></div><div class="h-12 bg-gray-200 rounded-xl shimmer"></div><div class="h-12 bg-gray-200 rounded-xl shimmer"></div></div>';
+            document.getElementById('listPali').innerHTML = '<div class="space-y-4"><div class="h-12 bg-gray-200 rounded-xl shimmer"></div><div class="h-12 bg-gray-200 rounded-xl shimmer"></div></div>';
+
+            Papa.parse(CSV_URL, {
                 download: true,
                 header: true,
                 skipEmptyLines: true,
-                complete: function(results) {
-                    if(results.data && results.data.length > 0) {
-                        processJSONData(results.data);
-                        icon.classList.remove('fa-spin');
-                        btnText.innerText = 'อัปเดตข้อมูล';
-                        showToast('ซิงค์ข้อมูลจากฐานข้อมูลล่าสุดสำเร็จ');
+                complete: (res) => {
+                    if(res.data && res.data.length > 0) {
+                        processData(res.data);
+                        showToast('ซิงค์ข้อมูลสำเร็จ');
                     } else {
-                        throw new Error('Empty Data');
+                        showToast('ไม่พบข้อมูล', 'error');
                     }
-                },
-                error: function(err) {
-                    console.error("Error:", err);
                     icon.classList.remove('fa-spin');
-                    btnText.innerText = 'ลองอีกครั้ง';
-                    showToast('เชื่อมต่อฐานข้อมูลล้มเหลว ตรวจสอบการแชร์', true);
-                    
-                    document.getElementById('nakThamListContainer').innerHTML = '<div class="col-span-full text-center py-10 text-red-500">เกิดข้อผิดพลาดในการดึงข้อมูล</div>';
-                    document.getElementById('paliListContainer').innerHTML = '<div class="col-span-full text-center py-10 text-red-500">เกิดข้อผิดพลาดในการดึงข้อมูล</div>';
+                    btnText.innerText = 'ซิงค์ข้อมูลล่าสุด';
+                },
+                error: (err) => {
+                    console.error(err);
+                    showToast('เชื่อมต่อผิดพลาด', 'error');
+                    icon.classList.remove('fa-spin');
+                    btnText.innerText = 'ลองใหม่';
                 }
             });
         }
 
-        function processJSONData(data) {
-            let stats = { total: 0, monks: 0, novices: 0, nakThamTotal: 0, paliTotal: 0 };
-            let classCounts = {};
-            let nakThamStudents = {};
-            let paliStudents = {};
+        function processData(data) {
+            let stats = { total: 0, monk: 0, novice: 0, tham: 0, pali: 0 };
+            let countByClass = {};
+            let rosterTham = {};
+            let rosterPali = {};
 
-            data.forEach(row => {
-                let classNameRaw = row['ชั้นเรียนที่สมัคร'] || row['ชั้นเรียน'];
-                let name = row['ชื่อ'] || row['ชื่อ-สกุล'];
+            data.forEach(r => {
+                let c = r['ชั้นเรียนที่สมัคร'] || r['ชั้นเรียน'];
+                let n = r['ชื่อ'] || r['ชื่อ-สกุล'];
+                if (!c || !n) return;
                 
-                if (!classNameRaw || !name) return;
+                c = toThaiNum(c.toString().trim());
+                n = n.toString().trim();
+                let title = (r['ฉายา'] || '').trim();
+                let sur = (r['นามสกุล'] || '').trim();
+                let phansaStr = (r['พรรษา'] || '').trim();
                 
-                classNameRaw = classNameRaw.toString().trim();
-                name = name.toString().trim();
-                const title = (row['ฉายา'] || '').toString().trim();
-                const surname = (row['นามสกุล'] || '').toString().trim();
-                const phansaStr = (row['พรรษา'] || '').toString().trim();
-
-                let className = toThaiNumerals(classNameRaw); 
                 stats.total++;
-                if (name.startsWith('พระ')) stats.monks++;
-                else if (name.startsWith('สามเณร')) stats.novices++;
+                if (n.startsWith('พระ')) stats.monk++;
+                else if (n.startsWith('สามเณร')) stats.novice++;
 
-                classCounts[className] = (classCounts[className] || 0) + 1;
+                countByClass[c] = (countByClass[c] || 0) + 1;
 
-                let fullName = name;
-                if (title && title !== '-') fullName += ' ' + title;
-                if (surname && surname !== '-') fullName += ' ' + surname;
-                
-                let phansa = 0;
-                if (phansaStr && phansaStr !== '-') phansa = parseInt(phansaStr, 10) || 0;
-                
-                const studentData = { name: fullName, phansa: phansa };
-                let isPali = className.includes('ป.ธ.') || className.includes('ประโยค');
-                
-                if (isPali) {
-                    stats.paliTotal++;
-                    if (!paliStudents[className]) paliStudents[className] = [];
-                    paliStudents[className].push(studentData);
+                let fullname = n + (title && title!=='-' ? ` ${title}` : '') + (sur && sur!=='-' ? ` ${sur}` : '');
+                let phansa = parseInt(phansaStr) || 0;
+                let student = { name: fullname, phansa };
+
+                if (c.includes('ป.ธ.') || c.includes('ประโยค')) {
+                    stats.pali++;
+                    if (!rosterPali[c]) rosterPali[c] = [];
+                    rosterPali[c].push(student);
                 } else {
-                    stats.nakThamTotal++;
-                    if (!nakThamStudents[className]) nakThamStudents[className] = [];
-                    nakThamStudents[className].push(studentData);
+                    stats.tham++;
+                    if (!rosterTham[c]) rosterTham[c] = [];
+                    rosterTham[c].push(student);
                 }
             });
 
-            updateDashboard(stats, classCounts, nakThamStudents, paliStudents);
+            // Update DOM Numbers
+            animateNum('statTotal', stats.total);
+            animateNum('statMonk', stats.monk);
+            animateNum('statNovice', stats.novice);
+            animateNum('statTham', stats.tham);
+            animateNum('statPali', stats.pali);
+
+            // Draw Charts
+            drawCharts(countByClass);
+
+            // Build Lists
+            buildList(rosterTham, 'listTham', 'text-temple-crimson');
+            buildList(rosterPali, 'listPali', 'text-temple-gold');
         }
 
-        function getClassSortIndex(className) {
-            const index = classOrderList.indexOf(className);
-            return index === -1 ? 999 : index;
-        }
-
-        function animateValue(id, start, end, duration) {
-            if (start === end) return;
-            let current = start;
-            const range = end - start;
-            const increment = end > start ? 1 : -1;
-            const stepTime = Math.abs(Math.floor(duration / range));
-            const obj = document.getElementById(id);
-            if(!obj) return;
-            
-            const timer = setInterval(function() {
-                current += increment;
-                obj.innerHTML = toThaiNumerals(current);
-                if (current == end) clearInterval(timer);
-            }, stepTime);
-        }
-
-        function updateDashboard(stats, classCounts, nakThamStudents, paliStudents) {
-            // Numbers
-            animateValue("totalStudents", 0, stats.total, 1000);
-            animateValue("totalMonks", 0, stats.monks, 1000);
-            animateValue("totalNovices", 0, stats.novices, 1000);
-            animateValue("totalNakTham", 0, stats.nakThamTotal, 1000);
-            animateValue("totalPali", 0, stats.paliTotal, 1000);
-
-            // Chart Configuration
-            const sortedLabels = Object.keys(classCounts).sort((a, b) => getClassSortIndex(a) - getClassSortIndex(b));
-            const values = sortedLabels.map(label => classCounts[label]);
-            const colors = sortedLabels.map(label => (label.includes('ป.ธ.') || label.includes('ประโยค')) ? '#d97706' : '#9f1239'); // Gold for Pali, Red for Nak Tham
-
-            if (myPieChart) myPieChart.destroy();
-            if (myBarChart) myBarChart.destroy();
-
+        function drawCharts(classData) {
             Chart.defaults.font.family = 'Sarabun';
-            Chart.defaults.font.size = 14;
-            Chart.defaults.color = '#78716c';
-            
-            // Pie Chart
-            const ctxPie = document.getElementById('pieChart').getContext('2d');
-            myPieChart = new Chart(ctxPie, {
+            Chart.defaults.color = '#64748b';
+
+            const getSortIdx = (c) => { let i = CLASS_ORDER.indexOf(c); return i === -1 ? 99 : i; };
+            const labels = Object.keys(classData).sort((a,b) => getSortIdx(a) - getSortIdx(b));
+            const vals = labels.map(l => classData[l]);
+            // Colors: Pali = Gold, Tham = Crimson
+            const colors = labels.map(l => (l.includes('ป.ธ.')||l.includes('ประโยค')) ? '#D4AF37' : '#881337');
+
+            if(chartPie) chartPie.destroy();
+            if(chartBar) chartBar.destroy();
+
+            // Minimalist Doughnut
+            chartPie = new Chart(document.getElementById('pieChart').getContext('2d'), {
                 type: 'doughnut',
-                data: { labels: sortedLabels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 0, hoverOffset: 4 }] },
+                data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderWidth: 0, hoverOffset: 4 }] },
                 options: {
-                    responsive: true, maintainAspectRatio: false, cutout: '70%',
-                    plugins: { 
-                        legend: { position: 'right', labels: { boxWidth: 10, usePointStyle: true, padding: 20 } },
+                    responsive: true, maintainAspectRatio: false, cutout: '75%',
+                    plugins: {
+                        legend: { display: false }, // Hide default legend for cleaner look
                         tooltip: { 
-                            backgroundColor: '#1c1917', padding: 12, cornerRadius: 8, 
-                            callbacks: { label: ctx => ` ${ctx.label}: ${toThaiNumerals(ctx.parsed)} รูป` } 
+                            backgroundColor: '#0f172a', padding: 12, cornerRadius: 8,
+                            callbacks: { label: c => ` ${c.label}: ${toThaiNum(c.parsed)} รูป` }
                         }
                     }
                 }
             });
 
-            // Bar Chart
-            const ctxBar = document.getElementById('barChart').getContext('2d');
-            myBarChart = new Chart(ctxBar, {
+            // Modern Bar
+            chartBar = new Chart(document.getElementById('barChart').getContext('2d'), {
                 type: 'bar',
-                data: { labels: sortedLabels, datasets: [{ data: values, backgroundColor: colors, borderRadius: 6 }] },
+                data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius: 6 }] },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    scales: { 
-                        y: { beginAtZero: true, grid: { color: '#f5f5f4', drawBorder: false }, ticks: { stepSize: 1, callback: val => toThaiNumerals(val) } },
-                        x: { grid: { display: false } }
+                    scales: {
+                        y: { display: false }, // Hide Y axis for ultimate clean look
+                        x: { grid: { display: false }, ticks: { font: {size: 11} } }
                     },
-                    plugins: { 
+                    plugins: {
                         legend: { display: false },
                         tooltip: { 
-                            backgroundColor: '#1c1917', padding: 12, cornerRadius: 8, 
-                            callbacks: { label: ctx => ` จำนวน ${toThaiNumerals(ctx.parsed.y)} รูป` } 
+                            backgroundColor: '#0f172a', padding: 12, cornerRadius: 8,
+                            callbacks: { title: ()=>null, label: c => ` ${c.label}: ${toThaiNum(c.parsed)} รูป` }
                         }
                     }
                 }
             });
-
-            // Render Rosters
-            renderStudentList(nakThamStudents, 'nakThamListContainer', 'border-brand-red', 'text-brand-red');
-            renderStudentList(paliStudents, 'paliListContainer', 'border-brand-gold', 'text-brand-gold');
         }
 
-        function renderStudentList(studentDataObj, containerId, borderClass, textClass) {
+        function buildList(data, containerId, accentClass) {
             const container = document.getElementById(containerId);
-            if (!container) return;
             container.innerHTML = '';
             
-            const sortedClasses = Object.keys(studentDataObj).sort((a, b) => getClassSortIndex(a) - getClassSortIndex(b));
-            
-            if(sortedClasses.length === 0) {
-                container.innerHTML = '<div class="col-span-full text-center text-gray-400 py-10">ยังไม่มีข้อมูลผู้สมัคร</div>';
+            const getSortIdx = (c) => { let i = CLASS_ORDER.indexOf(c); return i === -1 ? 99 : i; };
+            const classes = Object.keys(data).sort((a,b) => getSortIdx(a) - getSortIdx(b));
+
+            if(classes.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-gray-400 font-heading">ไม่พบข้อมูลผู้สมัคร</div>';
                 return;
             }
 
-            sortedClasses.forEach((className, index) => {
-                const students = studentDataObj[className];
-                students.sort((a, b) => b.phansa - a.phansa); 
-
-                const card = document.createElement('div');
-                card.setAttribute('data-aos', 'fade-up');
-                card.setAttribute('data-aos-delay', (index * 50).toString());
-                card.className = `bento-card p-6 border-t-4 ${borderClass}`;
+            let html = '<div class="space-y-6">';
+            classes.forEach(c => {
+                let students = data[c].sort((a,b) => b.phansa - a.phansa);
                 
-                const header = document.createElement('div');
-                header.className = 'flex justify-between items-center border-b pb-3 mb-4';
-                header.innerHTML = `<h4 class="font-heading font-bold text-lg ${textClass}">${className}</h4> <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">${toThaiNumerals(students.length)} รูป</span>`;
-                card.appendChild(header);
-
-                const ul = document.createElement('ul');
-                ul.className = 'text-sm space-y-2 text-gray-700 max-h-64 overflow-y-auto pr-2';
+                html += `
+                <div class="border border-gray-100 rounded-2xl bg-white overflow-hidden shadow-sm hover:shadow-md transition">
+                    <div class="bg-gray-50 px-5 py-3 border-b border-gray-100 flex justify-between items-center">
+                        <h4 class="font-heading font-bold text-gray-800">${c}</h4>
+                        <span class="${accentClass} bg-current/10 px-3 py-1 rounded-full text-xs font-bold">${toThaiNum(students.length)} รูป</span>
+                    </div>
+                    <ul class="divide-y divide-gray-50">
+                `;
                 
-                students.forEach((student, idx) => {
-                    const li = document.createElement('li');
-                    li.className = 'flex items-start';
-                    let phansaText = student.phansa > 0 ? `<span class="text-[10px] text-gray-400 ml-auto whitespace-nowrap pt-0.5">พรรษา ${toThaiNumerals(student.phansa)}</span>` : '';
-                    li.innerHTML = `<span class="text-gray-400 font-bold w-6 shrink-0">${toThaiNumerals(idx + 1)}.</span> <span class="font-medium">${student.name}</span> ${phansaText}`;
-                    ul.appendChild(li);
+                students.forEach((s, idx) => {
+                    let badge = s.phansa > 0 ? `<span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded ml-2 whitespace-nowrap">พรรษา ${toThaiNum(s.phansa)}</span>` : '';
+                    html += `
+                        <li class="px-5 py-3 flex items-center hover:bg-gray-50/50 transition">
+                            <span class="text-gray-300 font-heading text-sm w-6">${toThaiNum(idx+1)}.</span>
+                            <span class="text-gray-700 text-sm md:text-base">${s.name}</span>
+                            ${badge}
+                        </li>
+                    `;
                 });
-
-                card.appendChild(ul);
-                container.appendChild(card);
+                html += `</ul></div>`;
             });
-            setTimeout(() => { AOS.refresh(); }, 100);
+            html += '</div>';
+            container.innerHTML = html;
         }
+
     </script>
 </body>
 </html>
