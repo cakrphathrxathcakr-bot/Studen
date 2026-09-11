@@ -195,7 +195,7 @@
                 <div>
                     <h2 class="font-heading text-2xl md:text-4xl font-bold text-temple-dark mb-1">ระบบสถิติสารสนเทศ</h2>
                     <p class="text-gray-500 text-xs md:text-sm flex items-center justify-center md:justify-start gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> ข้อมูลซิงค์ตรงจากไฟล์ชีท
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> ข้อมูลซิงค์ตรงจากฝ่ายทะเบียน
                     </p>
                 </div>
                 <button onclick="fetchData()" id="refreshBtn" class="bg-temple-dark text-white hover:bg-black px-6 py-2.5 rounded-full font-heading text-xs md:text-sm shadow-lg flex items-center">
@@ -220,7 +220,7 @@
                     </div>
                 </div>
 
-                <!-- Sub Stats (2x2 grid on mobile) -->
+                <!-- Sub Stats -->
                 <div class="glass-light rounded-3xl p-5 md:p-6 flex flex-col justify-between" data-aos="fade-up" data-aos-delay="100">
                     <p class="text-gray-500 font-heading text-[10px] md:text-sm mb-2">พระภิกษุ</p>
                     <span id="statMonk" class="text-3xl md:text-5xl font-bold font-heading text-temple-dark">๐</span>
@@ -377,7 +377,7 @@
             }, 25);
         };
 
-        // --- SMART DATA FETCHER & PARSER ---
+        // --- CUSTOM SANGHA FORM PARSER ---
         function fetchData() {
             const btnText = document.getElementById('refreshText');
             const icon = document.getElementById('refreshIcon');
@@ -392,14 +392,14 @@
 
             Papa.parse(CSV_URL, {
                 download: true,
-                header: true,
+                header: false, // อ่านแบบ Array ล้วนเพื่อหลบปัญหาหัวตาราง 2 ชั้น
                 skipEmptyLines: true,
                 complete: (res) => {
-                    if(res.data && res.data.length > 0) {
-                        processSmartData(res.data);
+                    if(res.data && res.data.length > 2) {
+                        processSanghaData(res.data);
                         showToast('อัปเดตข้อมูลสำเร็จ');
                     } else {
-                        showToast('ไม่พบข้อมูล (ไฟล์ว่างเปล่า)', 'error');
+                        showToast('ไม่พบข้อมูล', 'error');
                         document.getElementById('listTham').innerHTML = '<p class="text-center text-xs text-red-400 py-6">ไม่มีข้อมูล</p>';
                         document.getElementById('listPali').innerHTML = '<p class="text-center text-xs text-red-400 py-6">ไม่มีข้อมูล</p>';
                     }
@@ -417,50 +417,78 @@
             });
         }
 
-        // ตัวค้นหาหัวคอลัมน์อัตโนมัติ (Smart Column Detection)
-        function processSmartData(data) {
-            // ดึงหัวคอลัมน์ทั้งหมดจากแถวแรก
-            const columns = Object.keys(data[0]);
+        function processSanghaData(rows) {
+            let h1 = rows[0];
+            let h2 = rows[1];
             
-            // ใช้เทคนิคเช็คคำ (Keyword Matching) เพื่อหาว่าคอลัมน์ไหนคืออะไร
-            const colClass = columns.find(c => c.includes('ชั้น') || c.includes('แผนก') || c.includes('ระดับ')) || columns[0];
-            const colName = columns.find(c => c.includes('ชื่อ') && !c.includes('สกุล')) || columns[1];
-            const colTitle = columns.find(c => c.includes('ฉายา'));
-            const colSurname = columns.find(c => c.includes('สกุล'));
-            const colPhansa = columns.find(c => c.includes('พรรษา'));
+            // กำหนดค่าเริ่มต้นของคอลัมน์ (Fallback) เผื่อสแกนไม่เจอ
+            let colPrefix = 2, colName = 3, colChaya = 4, colSurname = 5, colUpasombot = 7, colOldClass = 17, colClass = -1;
+            
+            // สแกนหาตำแหน่งคอลัมน์อัตโนมัติ
+            for(let i=0; i<h1.length; i++) {
+                let text1 = (h1[i] || '').trim();
+                let text2 = (h2[i] || '').trim();
+                let full = text1 + " " + text2;
+                
+                if(full.includes('คำนำหน้า')) colPrefix = i;
+                if(full === 'ชื่อ ' || text1 === 'ชื่อ' || text2 === 'ชื่อ') colName = i;
+                if(full.includes('ฉายา')) colChaya = i;
+                if(full.includes('นามสกุล')) colSurname = i;
+                if(full.includes('อุปสมบท')) colUpasombot = i;
+                if(full.includes('ชั้นเรียน') || full.includes('กำลังศึกษา') || full.includes('สมัคร')) colClass = i;
+                if(text2 === 'ประโยค' && h1[i-1] === 'ประโยคเดิม') colOldClass = i;
+            }
+            if(colOldClass === -1) {
+                for(let i=0; i<h2.length; i++) { if(h2[i] === 'ประโยค') colOldClass = i; }
+            }
 
             let stats = { total: 0, monk: 0, novice: 0, tham: 0, pali: 0 };
             let countByClass = {};
             let rosterTham = {};
             let rosterPali = {};
 
-            data.forEach(r => {
-                let c = r[colClass];
-                let n = r[colName];
+            // วนลูปเริ่มอ่านข้อมูลจากแถวที่ 3 (Index 2)
+            for(let r=2; r<rows.length; r++) {
+                let row = rows[r];
+                let prefix = (row[colPrefix] || '').trim();
+                let name = (row[colName] || '').trim();
+                let chaya = (row[colChaya] || '').trim();
+                let surname = (row[colSurname] || '').trim();
                 
-                // ถ้าไม่มีข้อมูลชั้นเรียนหรือชื่อ ให้ข้ามบรรทัดนี้ไป
-                if (!c || !n || c.trim()==='' || n.trim()==='') return;
-                
-                c = toThaiNum(c.toString().trim());
-                n = n.toString().trim();
-                let title = colTitle ? (r[colTitle] || '').trim() : '';
-                let sur = colSurname ? (r[colSurname] || '').trim() : '';
-                let phansaStr = colPhansa ? (r[colPhansa] || '').trim() : '';
-                
-                stats.total++;
-                if (n.startsWith('พระ')) stats.monk++;
-                else if (n.startsWith('สามเณร')) stats.novice++;
+                if(!name || name === '') continue; // ข้ามแถวที่ไม่มีชื่อ
 
+                // การรวมชื่อให้สวยงาม
+                let fullname = `${prefix}${name}`;
+                if (chaya && chaya !== '-') fullname += ` ${chaya}`;
+                if (surname && surname !== '-') fullname += ` ${surname}`;
+
+                stats.total++;
+                if (prefix.includes('พระ') || fullname.includes('พระ')) stats.monk++;
+                else if (prefix.includes('สามเณร') || fullname.includes('สามเณร')) stats.novice++;
+
+                // การหาชั้นเรียน
+                let c = '';
+                if (colClass !== -1 && row[colClass] && row[colClass].trim() !== '') {
+                    c = row[colClass].trim();
+                } else if (colOldClass !== -1 && row[colOldClass] && row[colOldClass].trim() !== '') {
+                    c = row[colOldClass].trim() + ' (เดิม)';
+                } else {
+                    c = 'ไม่ระบุชั้นเรียน';
+                }
+                c = toThaiNum(c);
                 countByClass[c] = (countByClass[c] || 0) + 1;
 
-                let fullname = n;
-                if(title && title!=='-' && !n.includes(title)) fullname += ` ${title}`;
-                if(sur && sur!=='-' && !n.includes(sur)) fullname += ` ${sur}`;
-                
-                let phansa = parseInt(phansaStr) || 0;
-                let student = { name: fullname, phansa };
+                // คำนวณพรรษา (สมมติปีปัจจุบันคือ 2569)
+                let upasombot = (row[colUpasombot] || '').trim();
+                let phansa = 0;
+                let match = upasombot.match(/25\d{2}/);
+                if(match) {
+                    phansa = 2569 - parseInt(match[0]);
+                    if(phansa < 0) phansa = 0;
+                }
 
-                // แยกบาลี/ธรรม
+                let student = { name: fullname, phansa: phansa };
+
                 if (c.includes('ป.ธ.') || c.includes('ประโยค')) {
                     stats.pali++;
                     if (!rosterPali[c]) rosterPali[c] = [];
@@ -470,9 +498,8 @@
                     if (!rosterTham[c]) rosterTham[c] = [];
                     rosterTham[c].push(student);
                 }
-            });
+            }
 
-            // อัปเดตตัวเลข
             animateNum('statTotal', stats.total);
             animateNum('statMonk', stats.monk);
             animateNum('statNovice', stats.novice);
@@ -488,7 +515,11 @@
             Chart.defaults.font.family = 'Sarabun';
             Chart.defaults.color = '#64748b';
 
-            const getSortIdx = (c) => { let i = CLASS_ORDER.indexOf(c); return i === -1 ? 99 : i; };
+            const getSortIdx = (c) => { 
+                let baseC = c.replace(' (เดิม)', '');
+                let i = CLASS_ORDER.indexOf(baseC); 
+                return i === -1 ? 99 : i; 
+            };
             const labels = Object.keys(classData).sort((a,b) => getSortIdx(a) - getSortIdx(b));
             const vals = labels.map(l => classData[l]);
             const colors = labels.map(l => (l.includes('ป.ธ.')||l.includes('ประโยค')) ? '#D4AF37' : '#881337');
@@ -533,7 +564,11 @@
 
         function buildList(data, containerId, accentClass) {
             const container = document.getElementById(containerId);
-            const getSortIdx = (c) => { let i = CLASS_ORDER.indexOf(c); return i === -1 ? 99 : i; };
+            const getSortIdx = (c) => { 
+                let baseC = c.replace(' (เดิม)', '');
+                let i = CLASS_ORDER.indexOf(baseC); 
+                return i === -1 ? 99 : i; 
+            };
             const classes = Object.keys(data).sort((a,b) => getSortIdx(a) - getSortIdx(b));
 
             if(classes.length === 0) {
