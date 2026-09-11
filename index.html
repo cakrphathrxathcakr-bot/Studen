@@ -324,4 +324,249 @@
             const nav = document.getElementById('navbar');
             if (window.scrollY > 50) {
                 nav.classList.add('bg-temple-dark/90', 'backdrop-blur-xl', 'border-white/10');
-   
+                nav.classList.remove('glass-dark');
+            } else {
+                nav.classList.add('glass-dark');
+                nav.classList.remove('bg-temple-dark/90', 'backdrop-blur-xl');
+            }
+        });
+
+        function enterWebsite() {
+            const splash = document.getElementById('welcomeScreen');
+            const main = document.getElementById('mainContent');
+            splash.classList.add('opacity-0');
+            setTimeout(() => {
+                splash.style.display = 'none';
+                main.classList.remove('hidden');
+                void main.offsetWidth;
+                main.classList.remove('opacity-0');
+                AOS.refresh();
+                fetchData();
+            }, 800);
+        }
+
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            const icon = document.getElementById('toastIcon');
+            if(type === 'error') {
+                icon.className = 'w-6 h-6 md:w-8 md:h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center';
+                icon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+            } else {
+                icon.className = 'w-6 h-6 md:w-8 md:h-8 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center';
+                icon.innerHTML = '<i class="fa-solid fa-check"></i>';
+            }
+            t.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => t.classList.add('translate-y-24', 'opacity-0'), 3000);
+        }
+
+        const toThaiNum = (num) => {
+            if (num == null) return '';
+            const t = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙'];
+            return num.toString().replace(/\d/g, m => t[m]);
+        };
+
+        const animateNum = (id, target) => {
+            const el = document.getElementById(id);
+            let current = 0;
+            const step = Math.max(1, Math.floor(target / 40));
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) { current = target; clearInterval(timer); }
+                el.innerText = toThaiNum(current);
+            }, 25);
+        };
+
+        // --- SMART DATA FETCHER & PARSER ---
+        function fetchData() {
+            const btnText = document.getElementById('refreshText');
+            const icon = document.getElementById('refreshIcon');
+            
+            btnText.innerText = 'Syncing...';
+            icon.classList.add('fa-spin');
+            
+            // Set Shimmer Skeletons
+            const skel = '<div class="space-y-3"><div class="h-10 bg-gray-200 rounded-xl shimmer"></div><div class="h-10 bg-gray-200 rounded-xl shimmer"></div></div>';
+            document.getElementById('listTham').innerHTML = skel;
+            document.getElementById('listPali').innerHTML = skel;
+
+            Papa.parse(CSV_URL, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: (res) => {
+                    if(res.data && res.data.length > 0) {
+                        processSmartData(res.data);
+                        showToast('อัปเดตข้อมูลสำเร็จ');
+                    } else {
+                        showToast('ไม่พบข้อมูล (ไฟล์ว่างเปล่า)', 'error');
+                        document.getElementById('listTham').innerHTML = '<p class="text-center text-xs text-red-400 py-6">ไม่มีข้อมูล</p>';
+                        document.getElementById('listPali').innerHTML = '<p class="text-center text-xs text-red-400 py-6">ไม่มีข้อมูล</p>';
+                    }
+                    icon.classList.remove('fa-spin');
+                    btnText.innerText = 'โหลดข้อมูลใหม่';
+                },
+                error: (err) => {
+                    console.error(err);
+                    showToast('เชื่อมต่อฐานข้อมูลล้มเหลว', 'error');
+                    icon.classList.remove('fa-spin');
+                    btnText.innerText = 'ลองใหม่';
+                    document.getElementById('listTham').innerHTML = '<p class="text-center text-xs text-red-400 py-6">การเชื่อมต่อล้มเหลว</p>';
+                    document.getElementById('listPali').innerHTML = '<p class="text-center text-xs text-red-400 py-6">การเชื่อมต่อล้มเหลว</p>';
+                }
+            });
+        }
+
+        // ตัวค้นหาหัวคอลัมน์อัตโนมัติ (Smart Column Detection)
+        function processSmartData(data) {
+            // ดึงหัวคอลัมน์ทั้งหมดจากแถวแรก
+            const columns = Object.keys(data[0]);
+            
+            // ใช้เทคนิคเช็คคำ (Keyword Matching) เพื่อหาว่าคอลัมน์ไหนคืออะไร
+            const colClass = columns.find(c => c.includes('ชั้น') || c.includes('แผนก') || c.includes('ระดับ')) || columns[0];
+            const colName = columns.find(c => c.includes('ชื่อ') && !c.includes('สกุล')) || columns[1];
+            const colTitle = columns.find(c => c.includes('ฉายา'));
+            const colSurname = columns.find(c => c.includes('สกุล'));
+            const colPhansa = columns.find(c => c.includes('พรรษา'));
+
+            let stats = { total: 0, monk: 0, novice: 0, tham: 0, pali: 0 };
+            let countByClass = {};
+            let rosterTham = {};
+            let rosterPali = {};
+
+            data.forEach(r => {
+                let c = r[colClass];
+                let n = r[colName];
+                
+                // ถ้าไม่มีข้อมูลชั้นเรียนหรือชื่อ ให้ข้ามบรรทัดนี้ไป
+                if (!c || !n || c.trim()==='' || n.trim()==='') return;
+                
+                c = toThaiNum(c.toString().trim());
+                n = n.toString().trim();
+                let title = colTitle ? (r[colTitle] || '').trim() : '';
+                let sur = colSurname ? (r[colSurname] || '').trim() : '';
+                let phansaStr = colPhansa ? (r[colPhansa] || '').trim() : '';
+                
+                stats.total++;
+                if (n.startsWith('พระ')) stats.monk++;
+                else if (n.startsWith('สามเณร')) stats.novice++;
+
+                countByClass[c] = (countByClass[c] || 0) + 1;
+
+                let fullname = n;
+                if(title && title!=='-' && !n.includes(title)) fullname += ` ${title}`;
+                if(sur && sur!=='-' && !n.includes(sur)) fullname += ` ${sur}`;
+                
+                let phansa = parseInt(phansaStr) || 0;
+                let student = { name: fullname, phansa };
+
+                // แยกบาลี/ธรรม
+                if (c.includes('ป.ธ.') || c.includes('ประโยค')) {
+                    stats.pali++;
+                    if (!rosterPali[c]) rosterPali[c] = [];
+                    rosterPali[c].push(student);
+                } else {
+                    stats.tham++;
+                    if (!rosterTham[c]) rosterTham[c] = [];
+                    rosterTham[c].push(student);
+                }
+            });
+
+            // อัปเดตตัวเลข
+            animateNum('statTotal', stats.total);
+            animateNum('statMonk', stats.monk);
+            animateNum('statNovice', stats.novice);
+            animateNum('statTham', stats.tham);
+            animateNum('statPali', stats.pali);
+
+            drawCharts(countByClass);
+            buildList(rosterTham, 'listTham', 'text-temple-crimson');
+            buildList(rosterPali, 'listPali', 'text-temple-gold');
+        }
+
+        function drawCharts(classData) {
+            Chart.defaults.font.family = 'Sarabun';
+            Chart.defaults.color = '#64748b';
+
+            const getSortIdx = (c) => { let i = CLASS_ORDER.indexOf(c); return i === -1 ? 99 : i; };
+            const labels = Object.keys(classData).sort((a,b) => getSortIdx(a) - getSortIdx(b));
+            const vals = labels.map(l => classData[l]);
+            const colors = labels.map(l => (l.includes('ป.ธ.')||l.includes('ประโยค')) ? '#D4AF37' : '#881337');
+
+            if(chartPie) chartPie.destroy();
+            if(chartBar) chartBar.destroy();
+
+            chartPie = new Chart(document.getElementById('pieChart').getContext('2d'), {
+                type: 'doughnut',
+                data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderWidth: 0, hoverOffset: 4 }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '70%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { 
+                            backgroundColor: '#0f172a', padding: 10, cornerRadius: 8, titleFont: {size: 13}, bodyFont: {size: 13},
+                            callbacks: { label: c => ` ${c.label}: ${toThaiNum(c.parsed)} รูป` }
+                        }
+                    }
+                }
+            });
+
+            chartBar = new Chart(document.getElementById('barChart').getContext('2d'), {
+                type: 'bar',
+                data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius: 4 }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { display: false }, 
+                        x: { grid: { display: false }, ticks: { font: {size: 10}, maxRotation: 45, minRotation: 45 } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { 
+                            backgroundColor: '#0f172a', padding: 10, cornerRadius: 8, titleFont: {size: 13}, bodyFont: {size: 13},
+                            callbacks: { title: ()=>null, label: c => ` ${c.label}: ${toThaiNum(c.parsed)} รูป` }
+                        }
+                    }
+                }
+            });
+        }
+
+        function buildList(data, containerId, accentClass) {
+            const container = document.getElementById(containerId);
+            const getSortIdx = (c) => { let i = CLASS_ORDER.indexOf(c); return i === -1 ? 99 : i; };
+            const classes = Object.keys(data).sort((a,b) => getSortIdx(a) - getSortIdx(b));
+
+            if(classes.length === 0) {
+                container.innerHTML = '<div class="text-center py-8 text-gray-400 font-heading text-sm">ไม่พบข้อมูลผู้สมัคร</div>';
+                return;
+            }
+
+            let html = '<div class="space-y-4 md:space-y-6">';
+            classes.forEach(c => {
+                let students = data[c].sort((a,b) => b.phansa - a.phansa);
+                html += `
+                <div class="border border-gray-100 rounded-xl bg-white overflow-hidden shadow-sm">
+                    <div class="bg-gray-50 px-4 py-2.5 border-b border-gray-100 flex justify-between items-center">
+                        <h4 class="font-heading font-bold text-gray-800 text-sm md:text-base">${c}</h4>
+                        <span class="${accentClass} bg-current/10 px-2.5 py-1 rounded-full text-[10px] md:text-xs font-bold">${toThaiNum(students.length)} รูป</span>
+                    </div>
+                    <ul class="divide-y divide-gray-50">
+                `;
+                students.forEach((s, idx) => {
+                    let badge = s.phansa > 0 ? `<span class="text-[9px] md:text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded ml-2 whitespace-nowrap shrink-0">พรรษา ${toThaiNum(s.phansa)}</span>` : '';
+                    html += `
+                        <li class="px-3 md:px-4 py-2.5 flex items-center hover:bg-gray-50/50">
+                            <span class="text-gray-300 font-heading text-xs md:text-sm w-5 md:w-6 shrink-0">${toThaiNum(idx+1)}.</span>
+                            <span class="text-gray-700 text-xs md:text-sm break-words">${s.name}</span>
+                            ${badge}
+                        </li>
+                    `;
+                });
+                html += `</ul></div>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
