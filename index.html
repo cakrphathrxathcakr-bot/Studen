@@ -86,6 +86,10 @@
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
         }
 
+        /* Hover Transitions */
+        .hover-lift { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease; }
+        .hover-lift:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -10px rgba(212, 175, 55, 0.2); }
+
         /* Responsive Text */
         .text-balance { text-wrap: balance; }
 
@@ -174,9 +178,14 @@
                     <p class="text-gray-400 text-sm md:text-lg font-light mb-8 max-w-md mx-auto lg:mx-0 leading-relaxed text-balance">
                         ศูนย์กลางการศึกษาพระปริยัติธรรม แผนกธรรม และบาลี สังกัดแม่กองธรรมสนามหลวง แห่งจังหวัดหนองบัวลำภู
                     </p>
-                    <a href="#dashboard" class="inline-block bg-temple-gold text-temple-darker px-8 py-3.5 rounded-full font-heading font-semibold shadow-gold-glow text-sm md:text-base hover:scale-105 transition-transform">
-                        ดูฐานข้อมูลนักเรียน
-                    </a>
+                    <div class="flex flex-wrap justify-center lg:justify-start gap-4">
+                        <a href="#dashboard" class="bg-temple-gold text-temple-darker px-6 py-3 md:px-8 md:py-3.5 rounded-full font-heading font-semibold shadow-gold-glow text-sm md:text-base hover:scale-105 transition-transform">
+                            ดูฐานข้อมูลนักเรียน
+                        </a>
+                        <a href="#about" class="bg-white/5 border border-white/10 text-white px-6 py-3 md:px-8 md:py-3.5 rounded-full font-heading text-sm md:text-base hover:bg-white/10 transition-colors">
+                            รู้จักเรา
+                        </a>
+                    </div>
                 </div>
                 <!-- Graphic for Desktop -->
                 <div class="hidden lg:flex justify-center relative" data-aos="zoom-in" data-aos-delay="200">
@@ -188,14 +197,141 @@
             </div>
         </section>
 
+        <!-- About Section -->
+        <section id="about" class="py-20 md:py-24 px-5 scroll-mt-20 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
+                    <div class="md:col-span-5" data-aos="fade-up">
+                        <h2 class="font-heading text-3xl md:text-5xl font-bold text-temple-dark mb-4">อัตลักษณ์แห่ง<br>สถานศึกษา</h2>
+                        <div class="w-16 h-1.5 bg-temple-gold rounded-full mb-6 md:mb-8"></div>
+                        <p class="text-gray-600 text-base md:text-lg leading-relaxed text-balance">
+                            มุ่งมั่นสร้างศาสนทายาทให้มีความรู้ความเข้าใจในพระธรรมวินัยอย่างถ่องแท้ เป็นกำลังสำคัญในการเผยแผ่และสืบทอดอายุพระพุทธศาสนา
+                        </p>
+                    </div>
+                    
+                    <div class="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
+                        <!-- Bento Info Cards -->
+                        <div class="glass-light p-6 md:p-8 rounded-3xl hover-lift" data-aos="fade-up" data-aos-delay="100">
+                            <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-100 flex items-center justify-center mb-4 md:mb-6">
+                                <i class="fa-solid fa-eye text-temple-dark text-lg md:text-xl"></i>
+                            </div>
+                            <h3 class="font-heading text-lg md:text-xl font-bold text-temple-dark mb-2 md:mb-3">วิสัยทัศน์</h3>
+                            <p class="text-gray-600 text-xs md:text-sm leading-relaxed">ศูนย์กลางการศึกษาพระปริยัติธรรมที่มีมาตรฐาน สืบทอดศาสนทายาทผู้เปี่ยมด้วยความรู้คู่คุณธรรม</p>
+                        </div>
+                        <div class="glass-light p-6 md:p-8 rounded-3xl hover-lift" data-aos="fade-up" data-aos-delay="200">
+                            <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-rose-50 flex items-center justify-center mb-4 md:mb-6">
+                                <i class="fa-solid fa-fingerprint text-temple-crimson text-lg md:text-xl"></i>
+                            </div>
+                            <h3 class="font-heading text-lg md:text-xl font-bold text-temple-dark mb-2 md:mb-3">อัตลักษณ์</h3>
+                            <p class="text-temple-crimson font-medium text-xs md:text-sm leading-relaxed">"ความรู้ดี ศีลวัตรงดงาม พร้อมนำธรรมสู่ชุมชน"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Personnel Section -->
+        <section id="personnel" class="py-20 md:py-24 px-5 bg-white/50 border-y border-gray-100 scroll-mt-20">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 gap-4 md:gap-6" data-aos="fade-up">
+                    <div>
+                        <h2 class="font-heading text-3xl md:text-5xl font-bold text-temple-dark mb-2">ทำเนียบบุคลากร</h2>
+                        <p class="text-gray-500 text-sm md:text-base">คณะผู้บริหารและคณาจารย์ ประจำปีการศึกษา ๒๕๖๙</p>
+                    </div>
+                    <div class="bg-temple-gold/10 text-temple-gold px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-heading font-semibold">
+                        สำนักเรียนวัดประสานศรัทธา
+                    </div>
+                </div>
+
+                <!-- Executive Highlights -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6 mb-8 md:mb-12">
+                    <div class="lg:col-span-2 glass-light rounded-3xl p-6 md:p-12 border-l-[6px] border-temple-gold relative overflow-hidden group hover:shadow-premium transition" data-aos="fade-up">
+                        <div class="absolute right-0 bottom-0 opacity-[0.03] transform translate-x-1/4 translate-y-1/4 pointer-events-none">
+                            <i class="fa-solid fa-crown text-[10rem] md:text-[15rem]"></i>
+                        </div>
+                        <span class="text-[10px] md:text-xs font-heading font-bold text-temple-gold tracking-widest uppercase mb-2 block">เจ้าสำนักศาสนศึกษา</span>
+                        <h3 class="font-heading text-2xl md:text-3xl font-bold text-temple-dark mb-1">พระมหาฉัตรชัย ชยญาณเมธี</h3>
+                        <p class="text-temple-gold font-bold mb-4 md:mb-6 text-sm md:text-base">ป.ธ.๙, พธ.ม.</p>
+                        <ul class="space-y-2 text-xs md:text-sm text-gray-600 border-t border-gray-100 pt-4 md:pt-6">
+                            <li class="flex items-center"><i class="fa-solid fa-check text-temple-gold mr-3"></i> เจ้าอาวาสวัดประสานศรัทธา</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-temple-gold mr-3"></i> รองเจ้าคณะจังหวัดหนองบัวลำภู</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-temple-gold mr-3"></i> เลขานุการประธานศูนย์พระปริยัตินิเทศก์จังหวัด</li>
+                        </ul>
+                    </div>
+
+                    <div class="flex flex-col gap-5 md:gap-6">
+                        <div class="glass-light p-5 md:p-6 rounded-3xl border border-gray-100 hover:shadow-premium transition" data-aos="fade-up" data-aos-delay="100">
+                            <span class="text-[10px] md:text-xs font-heading font-bold text-gray-400 mb-1 block">ที่ปรึกษา (เขต ๑)</span>
+                            <h4 class="font-heading text-base md:text-lg font-bold text-temple-dark">พระครูพรหมสีลาภิวัฒน์</h4>
+                            <p class="text-[10px] md:text-xs text-gray-500 mt-1">เจ้าคณะตำบลเก่ากลอย (น.ธ.เอก)</p>
+                        </div>
+                        <div class="glass-light p-5 md:p-6 rounded-3xl border border-gray-100 hover:shadow-premium transition" data-aos="fade-up" data-aos-delay="200">
+                            <span class="text-[10px] md:text-xs font-heading font-bold text-gray-400 mb-1 block">ที่ปรึกษา (เขต ๒)</span>
+                            <h4 class="font-heading text-base md:text-lg font-bold text-temple-dark">พระครูสุตพัชโรภาส</h4>
+                            <p class="text-[10px] md:text-xs text-gray-500 mt-1">เจ้าคณะตำบลเก่ากลอย (ป.ธ.๓)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Grid for Teachers -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                    <!-- Management -->
+                    <div class="bg-slate-900 rounded-3xl p-6 md:p-8 text-white relative overflow-hidden hover-lift" data-aos="fade-right">
+                        <div class="absolute top-0 right-0 p-6 opacity-20"><i class="fa-solid fa-sitemap text-5xl"></i></div>
+                        <h4 class="font-heading text-lg md:text-xl font-bold mb-4 md:mb-6 text-temple-gold border-b border-white/10 pb-4">ฝ่ายบริหารสำนักเรียน</h4>
+                        <div class="space-y-4 md:space-y-5 text-sm md:text-base">
+                            <div>
+                                <p class="text-[10px] md:text-xs text-gray-400 font-heading mb-1">อาจารย์ใหญ่</p>
+                                <p class="font-bold">พระมหาวิไน ชยเมธี <span class="text-temple-gold font-normal text-xs md:text-sm ml-2">ป.ธ.๔</span></p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] md:text-xs text-gray-400 font-heading mb-1">รองอาจารย์ใหญ่</p>
+                                <p class="font-bold">พระมหาชินดนัย ฐิตวุฑฺฒิเมธี <span class="text-temple-gold font-normal text-xs md:text-sm ml-2">ป.ธ.๔</span></p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-[10px] md:text-xs text-gray-400 font-heading mb-1">ผู้ช่วยเจ้าสำนัก</p>
+                                    <p class="font-bold text-xs md:text-sm">พระมหายุทธชัย <span class="text-temple-gold font-normal text-[10px] md:text-xs block">ป.ธ.๓</span></p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] md:text-xs text-gray-400 font-heading mb-1">เลขานุการ</p>
+                                    <p class="font-bold text-xs md:text-sm">พระมหาจักรภัทร <span class="text-temple-gold font-normal text-[10px] md:text-xs block">ป.ธ.๔</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Teachers -->
+                    <div class="grid grid-rows-2 gap-5 md:gap-6">
+                        <div class="glass-light rounded-3xl p-5 md:p-6 border-l-[4px] border-temple-gold hover-lift flex flex-col justify-center" data-aos="fade-left">
+                            <h4 class="font-heading font-bold text-temple-dark mb-3 flex items-center text-sm md:text-base"><i class="fa-solid fa-book-open text-temple-gold mr-2"></i> ครูสอนแผนกบาลี</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-gray-50 border border-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium">พระมหานิพนธ์ (ป.ธ.๕)</span>
+                                <span class="bg-gray-50 border border-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium">พระมหาอนุวัต (ป.ธ.๓)</span>
+                            </div>
+                        </div>
+                        <div class="glass-light rounded-3xl p-5 md:p-6 border-l-[4px] border-temple-crimson hover-lift flex flex-col justify-center" data-aos="fade-left" data-aos-delay="100">
+                            <h4 class="font-heading font-bold text-temple-dark mb-3 flex items-center text-sm md:text-base"><i class="fa-solid fa-scroll text-temple-crimson mr-2"></i> ครูสอนแผนกธรรม</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-gray-50 border border-gray-100 text-gray-700 px-3 py-1 rounded-lg text-[10px] md:text-xs font-medium">พระมหากันต์นภัทร (ป.ธ.๔)</span>
+                                <span class="bg-gray-50 border border-gray-100 text-gray-700 px-3 py-1 rounded-lg text-[10px] md:text-xs font-medium">พระมหาสนธยา (ป.ธ.๓)</span>
+                                <span class="bg-gray-50 border border-gray-100 text-gray-700 px-3 py-1 rounded-lg text-[10px] md:text-xs font-medium">สามเณรพุฒิพงษ์</span>
+                                <span class="bg-gray-50 border border-gray-100 text-gray-700 px-3 py-1 rounded-lg text-[10px] md:text-xs font-medium">สามเณรเจษฎา</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- DASHBOARD (Mobile Optimized) -->
-        <main id="dashboard" class="max-w-7xl mx-auto px-4 py-16 md:py-24 w-full scroll-mt-20">
+        <main id="dashboard" class="max-w-7xl mx-auto px-4 py-16 md:py-24 w-full scroll-mt-20 border-t border-gray-100">
             
             <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 text-center md:text-left" data-aos="fade-up">
                 <div>
                     <h2 class="font-heading text-2xl md:text-4xl font-bold text-temple-dark mb-1">ระบบสถิติสารสนเทศ</h2>
                     <p class="text-gray-500 text-xs md:text-sm flex items-center justify-center md:justify-start gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> ซิงค์ตรงจาก Google Sheets แบบเรียลไทม์
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> ซิงค์ตรงจากตารางทะเบียน
                     </p>
                 </div>
                 <button onclick="fetchData()" id="refreshBtn" class="bg-temple-dark text-white hover:bg-black px-6 py-2.5 rounded-full font-heading text-xs md:text-sm shadow-lg flex items-center">
@@ -377,7 +513,7 @@
             }, 25);
         };
 
-        // --- NEW LOGIC: SEPARATOR ROW PARSER & PHANSA CALCULATION ---
+        // --- Custom Sangha Parser ---
         function fetchData() {
             const btnText = document.getElementById('refreshText');
             const icon = document.getElementById('refreshIcon');
@@ -389,7 +525,6 @@
             document.getElementById('listTham').innerHTML = skel;
             document.getElementById('listPali').innerHTML = skel;
 
-            // Use header: false to parse as raw arrays and handle multi-tier headers + separator rows easily
             Papa.parse(CSV_URL, {
                 download: true,
                 header: false,
@@ -418,9 +553,9 @@
         }
 
         function processSanghaData(rows) {
-            // Find Column Indices dynamically from top rows
             let colPrefix = 2, colName = 3, colChaya = 4, colSurname = 5, colUpasombot = 7;
             
+            // หาคอลัมน์จาก 3 แถวบนสุด
             for (let r = 0; r < 3; r++) {
                 if(!rows[r]) continue;
                 for (let c = 0; c < rows[r].length; c++) {
@@ -438,10 +573,8 @@
             let rosterTham = {};
             let rosterPali = {};
             
-            // Default class if no separator is found initially
             let currentClass = "ไม่ระบุชั้นเรียน";
 
-            // Loop starting from data rows (assuming rows 0 and 1 are headers)
             for (let r = 2; r < rows.length; r++) {
                 let row = rows[r];
                 if (!row || row.length === 0) continue;
@@ -451,21 +584,18 @@
                 let chaya = (row[colChaya] || '').toString().trim();
                 let surname = (row[colSurname] || '').toString().trim();
 
-                // Logic for "Separator Row"
-                // If there is no 'Name', but the row has some text, treat it as a Class Separator
+                // การแยกแถวคั่น (Separator Row)
                 if (!name) {
                     let rowText = row.join("").trim();
                     if (rowText !== "") {
-                        // Find the first non-empty cell in this row to use as the class name
                         let foundClass = row.find(cell => cell && cell.toString().trim() !== "");
                         if (foundClass) {
                             currentClass = foundClass.toString().trim();
                         }
                     }
-                    continue; // Skip the rest of the loop for this separator row
+                    continue; 
                 }
 
-                // If code reaches here, it's a valid Student Row
                 let fullname = `${prefix}${name}`;
                 if (chaya && chaya !== '-') fullname += ` ${chaya}`;
                 if (surname && surname !== '-') fullname += ` ${surname}`;
@@ -474,13 +604,12 @@
                 if (prefix.includes('พระ') || fullname.includes('พระ')) stats.monk++;
                 else if (prefix.includes('สามเณร') || fullname.includes('สามเณร')) stats.novice++;
 
-                // Track student counts by current active class
                 countByClass[currentClass] = (countByClass[currentClass] || 0) + 1;
 
-                // Calculate Phansa from year 2569 (2026)
+                // คำนวณพรรษา เทียบปี 2569
                 let upasombot = (row[colUpasombot] || '').toString().trim();
                 let phansa = 0;
-                let yearMatch = upasombot.match(/25\d{2}/); // look for patterns like 2565
+                let yearMatch = upasombot.match(/25\d{2}/);
                 if (yearMatch) {
                     phansa = 2569 - parseInt(yearMatch[0]);
                     if (phansa < 0) phansa = 0;
@@ -488,7 +617,6 @@
 
                 let student = { name: fullname, phansa: phansa };
 
-                // Group into Tham / Pali
                 if (currentClass.includes('ป.ธ.') || currentClass.includes('ประโยค')) {
                     stats.pali++;
                     if (!rosterPali[currentClass]) rosterPali[currentClass] = [];
@@ -500,14 +628,12 @@
                 }
             }
 
-            // Update UI Numbers
             animateNum('statTotal', stats.total);
             animateNum('statMonk', stats.monk);
             animateNum('statNovice', stats.novice);
             animateNum('statTham', stats.tham);
             animateNum('statPali', stats.pali);
 
-            // Render components
             drawCharts(countByClass);
             buildList(rosterTham, 'listTham', 'text-temple-crimson');
             buildList(rosterPali, 'listPali', 'text-temple-gold');
@@ -572,7 +698,6 @@
 
             let html = '<div class="space-y-4 md:space-y-6">';
             classes.forEach(c => {
-                // Sort students by Phansa (Descending)
                 let students = data[c].sort((a,b) => b.phansa - a.phansa);
                 
                 html += `
