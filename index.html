@@ -195,7 +195,7 @@
                 <div>
                     <h2 class="font-heading text-2xl md:text-4xl font-bold text-temple-dark mb-1">ระบบสถิติสารสนเทศ</h2>
                     <p class="text-gray-500 text-xs md:text-sm flex items-center justify-center md:justify-start gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> ข้อมูลซิงค์ตรงจากฝ่ายทะเบียน
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> ซิงค์ตรงจาก Google Sheets แบบเรียลไทม์
                     </p>
                 </div>
                 <button onclick="fetchData()" id="refreshBtn" class="bg-temple-dark text-white hover:bg-black px-6 py-2.5 rounded-full font-heading text-xs md:text-sm shadow-lg flex items-center">
@@ -258,7 +258,7 @@
             <div id="roster" class="mb-10">
                 <div class="text-center mb-8" data-aos="fade-up">
                     <h2 class="font-heading text-2xl md:text-4xl font-bold text-temple-dark mb-2">รายชื่อนักเรียน</h2>
-                    <p class="text-gray-500 text-xs md:text-sm">จำแนกตามแผนกและพรรษา</p>
+                    <p class="text-gray-500 text-xs md:text-sm">จำแนกตามแผนกและจัดเรียงตามพรรษา</p>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -377,7 +377,7 @@
             }, 25);
         };
 
-        // --- CUSTOM SANGHA FORM PARSER ---
+        // --- NEW LOGIC: SEPARATOR ROW PARSER & PHANSA CALCULATION ---
         function fetchData() {
             const btnText = document.getElementById('refreshText');
             const icon = document.getElementById('refreshIcon');
@@ -385,14 +385,14 @@
             btnText.innerText = 'Syncing...';
             icon.classList.add('fa-spin');
             
-            // Set Shimmer Skeletons
             const skel = '<div class="space-y-3"><div class="h-10 bg-gray-200 rounded-xl shimmer"></div><div class="h-10 bg-gray-200 rounded-xl shimmer"></div></div>';
             document.getElementById('listTham').innerHTML = skel;
             document.getElementById('listPali').innerHTML = skel;
 
+            // Use header: false to parse as raw arrays and handle multi-tier headers + separator rows easily
             Papa.parse(CSV_URL, {
                 download: true,
-                header: false, // อ่านแบบ Array ล้วนเพื่อหลบปัญหาหัวตาราง 2 ชั้น
+                header: false,
                 skipEmptyLines: true,
                 complete: (res) => {
                     if(res.data && res.data.length > 2) {
@@ -418,46 +418,54 @@
         }
 
         function processSanghaData(rows) {
-            let h1 = rows[0];
-            let h2 = rows[1];
+            // Find Column Indices dynamically from top rows
+            let colPrefix = 2, colName = 3, colChaya = 4, colSurname = 5, colUpasombot = 7;
             
-            // กำหนดค่าเริ่มต้นของคอลัมน์ (Fallback) เผื่อสแกนไม่เจอ
-            let colPrefix = 2, colName = 3, colChaya = 4, colSurname = 5, colUpasombot = 7, colOldClass = 17, colClass = -1;
-            
-            // สแกนหาตำแหน่งคอลัมน์อัตโนมัติ
-            for(let i=0; i<h1.length; i++) {
-                let text1 = (h1[i] || '').trim();
-                let text2 = (h2[i] || '').trim();
-                let full = text1 + " " + text2;
-                
-                if(full.includes('คำนำหน้า')) colPrefix = i;
-                if(full === 'ชื่อ ' || text1 === 'ชื่อ' || text2 === 'ชื่อ') colName = i;
-                if(full.includes('ฉายา')) colChaya = i;
-                if(full.includes('นามสกุล')) colSurname = i;
-                if(full.includes('อุปสมบท')) colUpasombot = i;
-                if(full.includes('ชั้นเรียน') || full.includes('กำลังศึกษา') || full.includes('สมัคร')) colClass = i;
-                if(text2 === 'ประโยค' && h1[i-1] === 'ประโยคเดิม') colOldClass = i;
-            }
-            if(colOldClass === -1) {
-                for(let i=0; i<h2.length; i++) { if(h2[i] === 'ประโยค') colOldClass = i; }
+            for (let r = 0; r < 3; r++) {
+                if(!rows[r]) continue;
+                for (let c = 0; c < rows[r].length; c++) {
+                    let val = (rows[r][c] || '').toString().trim();
+                    if (val.includes('คำนำหน้า')) colPrefix = c;
+                    if (val === 'ชื่อ' || val === 'ชื่อ ') colName = c;
+                    if (val.includes('ฉายา')) colChaya = c;
+                    if (val.includes('นามสกุล')) colSurname = c;
+                    if (val.includes('อุปสมบท')) colUpasombot = c;
+                }
             }
 
             let stats = { total: 0, monk: 0, novice: 0, tham: 0, pali: 0 };
             let countByClass = {};
             let rosterTham = {};
             let rosterPali = {};
+            
+            // Default class if no separator is found initially
+            let currentClass = "ไม่ระบุชั้นเรียน";
 
-            // วนลูปเริ่มอ่านข้อมูลจากแถวที่ 3 (Index 2)
-            for(let r=2; r<rows.length; r++) {
+            // Loop starting from data rows (assuming rows 0 and 1 are headers)
+            for (let r = 2; r < rows.length; r++) {
                 let row = rows[r];
-                let prefix = (row[colPrefix] || '').trim();
-                let name = (row[colName] || '').trim();
-                let chaya = (row[colChaya] || '').trim();
-                let surname = (row[colSurname] || '').trim();
-                
-                if(!name || name === '') continue; // ข้ามแถวที่ไม่มีชื่อ
+                if (!row || row.length === 0) continue;
 
-                // การรวมชื่อให้สวยงาม
+                let prefix = (row[colPrefix] || '').toString().trim();
+                let name = (row[colName] || '').toString().trim();
+                let chaya = (row[colChaya] || '').toString().trim();
+                let surname = (row[colSurname] || '').toString().trim();
+
+                // Logic for "Separator Row"
+                // If there is no 'Name', but the row has some text, treat it as a Class Separator
+                if (!name) {
+                    let rowText = row.join("").trim();
+                    if (rowText !== "") {
+                        // Find the first non-empty cell in this row to use as the class name
+                        let foundClass = row.find(cell => cell && cell.toString().trim() !== "");
+                        if (foundClass) {
+                            currentClass = foundClass.toString().trim();
+                        }
+                    }
+                    continue; // Skip the rest of the loop for this separator row
+                }
+
+                // If code reaches here, it's a valid Student Row
                 let fullname = `${prefix}${name}`;
                 if (chaya && chaya !== '-') fullname += ` ${chaya}`;
                 if (surname && surname !== '-') fullname += ` ${surname}`;
@@ -466,46 +474,40 @@
                 if (prefix.includes('พระ') || fullname.includes('พระ')) stats.monk++;
                 else if (prefix.includes('สามเณร') || fullname.includes('สามเณร')) stats.novice++;
 
-                // การหาชั้นเรียน
-                let c = '';
-                if (colClass !== -1 && row[colClass] && row[colClass].trim() !== '') {
-                    c = row[colClass].trim();
-                } else if (colOldClass !== -1 && row[colOldClass] && row[colOldClass].trim() !== '') {
-                    c = row[colOldClass].trim() + ' (เดิม)';
-                } else {
-                    c = 'ไม่ระบุชั้นเรียน';
-                }
-                c = toThaiNum(c);
-                countByClass[c] = (countByClass[c] || 0) + 1;
+                // Track student counts by current active class
+                countByClass[currentClass] = (countByClass[currentClass] || 0) + 1;
 
-                // คำนวณพรรษา (สมมติปีปัจจุบันคือ 2569)
-                let upasombot = (row[colUpasombot] || '').trim();
+                // Calculate Phansa from year 2569 (2026)
+                let upasombot = (row[colUpasombot] || '').toString().trim();
                 let phansa = 0;
-                let match = upasombot.match(/25\d{2}/);
-                if(match) {
-                    phansa = 2569 - parseInt(match[0]);
-                    if(phansa < 0) phansa = 0;
+                let yearMatch = upasombot.match(/25\d{2}/); // look for patterns like 2565
+                if (yearMatch) {
+                    phansa = 2569 - parseInt(yearMatch[0]);
+                    if (phansa < 0) phansa = 0;
                 }
 
                 let student = { name: fullname, phansa: phansa };
 
-                if (c.includes('ป.ธ.') || c.includes('ประโยค')) {
+                // Group into Tham / Pali
+                if (currentClass.includes('ป.ธ.') || currentClass.includes('ประโยค')) {
                     stats.pali++;
-                    if (!rosterPali[c]) rosterPali[c] = [];
-                    rosterPali[c].push(student);
+                    if (!rosterPali[currentClass]) rosterPali[currentClass] = [];
+                    rosterPali[currentClass].push(student);
                 } else {
                     stats.tham++;
-                    if (!rosterTham[c]) rosterTham[c] = [];
-                    rosterTham[c].push(student);
+                    if (!rosterTham[currentClass]) rosterTham[currentClass] = [];
+                    rosterTham[currentClass].push(student);
                 }
             }
 
+            // Update UI Numbers
             animateNum('statTotal', stats.total);
             animateNum('statMonk', stats.monk);
             animateNum('statNovice', stats.novice);
             animateNum('statTham', stats.tham);
             animateNum('statPali', stats.pali);
 
+            // Render components
             drawCharts(countByClass);
             buildList(rosterTham, 'listTham', 'text-temple-crimson');
             buildList(rosterPali, 'listPali', 'text-temple-gold');
@@ -515,11 +517,7 @@
             Chart.defaults.font.family = 'Sarabun';
             Chart.defaults.color = '#64748b';
 
-            const getSortIdx = (c) => { 
-                let baseC = c.replace(' (เดิม)', '');
-                let i = CLASS_ORDER.indexOf(baseC); 
-                return i === -1 ? 99 : i; 
-            };
+            const getSortIdx = (c) => { let i = CLASS_ORDER.indexOf(c); return i === -1 ? 99 : i; };
             const labels = Object.keys(classData).sort((a,b) => getSortIdx(a) - getSortIdx(b));
             const vals = labels.map(l => classData[l]);
             const colors = labels.map(l => (l.includes('ป.ธ.')||l.includes('ประโยค')) ? '#D4AF37' : '#881337');
@@ -564,11 +562,7 @@
 
         function buildList(data, containerId, accentClass) {
             const container = document.getElementById(containerId);
-            const getSortIdx = (c) => { 
-                let baseC = c.replace(' (เดิม)', '');
-                let i = CLASS_ORDER.indexOf(baseC); 
-                return i === -1 ? 99 : i; 
-            };
+            const getSortIdx = (c) => { let i = CLASS_ORDER.indexOf(c); return i === -1 ? 99 : i; };
             const classes = Object.keys(data).sort((a,b) => getSortIdx(a) - getSortIdx(b));
 
             if(classes.length === 0) {
@@ -578,11 +572,13 @@
 
             let html = '<div class="space-y-4 md:space-y-6">';
             classes.forEach(c => {
+                // Sort students by Phansa (Descending)
                 let students = data[c].sort((a,b) => b.phansa - a.phansa);
+                
                 html += `
                 <div class="border border-gray-100 rounded-xl bg-white overflow-hidden shadow-sm">
                     <div class="bg-gray-50 px-4 py-2.5 border-b border-gray-100 flex justify-between items-center">
-                        <h4 class="font-heading font-bold text-gray-800 text-sm md:text-base">${c}</h4>
+                        <h4 class="font-heading font-bold text-gray-800 text-sm md:text-base">${toThaiNum(c)}</h4>
                         <span class="${accentClass} bg-current/10 px-2.5 py-1 rounded-full text-[10px] md:text-xs font-bold">${toThaiNum(students.length)} รูป</span>
                     </div>
                     <ul class="divide-y divide-gray-50">
